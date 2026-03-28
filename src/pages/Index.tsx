@@ -4,6 +4,7 @@ import { ReportForm } from "@/components/ReportForm";
 import { StatsCards } from "@/components/StatsCards";
 import { BreakdownGrid } from "@/components/BreakdownGrid";
 import { ReportFeed } from "@/components/ReportFeed";
+import { ResponsesChart } from "@/components/ResponsesChart";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Report } from "@/lib/types";
@@ -55,6 +56,7 @@ export default function Index() {
         <DisclaimerBanner />
         <StatsCards selected={counts.selected} notSelected={counts.not_selected} total={total} />
         <BreakdownGrid reports={reports} />
+        <ResponsesChart reports={reports} />
         <ReportFeed reports={reports} />
       </main>
     </div>
