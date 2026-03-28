@@ -16,7 +16,7 @@ export function DashboardHeader({ onRefresh }: DashboardHeaderProps) {
           <h1 className="text-lg font-bold tracking-tight">
             H1B<span className="text-primary">Pulse</span>
           </h1>
-          <span className="text-xs text-muted-foreground hidden sm:inline">FY2026 Lottery Tracker</span>
+          <span className="text-xs text-muted-foreground hidden sm:inline"><span className="text-xs text-muted-foreground hidden sm:inline">FY2027 Lottery Tracker</span></span>
           <span className="flex items-center gap-1.5 text-xs text-primary">
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse-glow" />
             Live
