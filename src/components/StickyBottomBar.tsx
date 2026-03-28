@@ -1,17 +1,31 @@
 import { useState } from "react";
 import { ClipboardList } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export function StickyBottomBar() {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleNotify = () => {
+  const handleNotify = async () => {
     if (!email || !email.includes("@")) {
       toast.error("Please enter a valid email address");
       return;
     }
-    toast.success("You'll be notified when petition tracking launches!");
-    setEmail("");
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from("notification_emails")
+        .insert({ email: email.trim() });
+      if (error) throw error;
+      toast.success("You'll be notified when petition tracking launches!");
+      setEmail("");
+    } catch (err) {
+      console.error("Failed to save email:", err);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
