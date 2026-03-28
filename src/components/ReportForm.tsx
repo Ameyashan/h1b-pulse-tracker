@@ -54,7 +54,7 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
   };
 
   return (
-    <div className="stat-card">
+    <div className="stat-card border-2 border-transparent" style={{ borderImage: 'linear-gradient(135deg, hsl(45 93% 47%), hsl(36 100% 50%), hsl(45 93% 47%)) 1' }}>
       <h2 className="text-sm font-semibold mb-3">Report Your H1B Lottery Result</h2>
       <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
         {/* Status */}
