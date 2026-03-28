@@ -14,6 +14,7 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
   const [status, setStatus] = useState<ReportStatus | "">("");
   const [wageLevel, setWageLevel] = useState<WageLevel | "">("");
   const [education, setEducation] = useState<EducationLevel | "">("");
+  const [honeypot, setHoneypot] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const canSubmit = status && wageLevel && education && !submitting;
@@ -22,23 +23,24 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
     if (!canSubmit) return;
     setSubmitting(true);
     try {
-      const { error } = await supabase.from("signals").insert({
-        source_id: `self_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-        source_type: "self_report",
-        classification: status,
-        wage_level: wageLevel,
-        education_level: education,
-        title: `${status === "selected" ? "Selected" : "Not Selected"} — Level ${wageLevel}, ${education}`,
-        body: "",
-        permalink: "",
-        author: "anonymous",
-        created_utc: new Date().toISOString(),
-        score: 0,
-        employer_mentions: [],
-        extracted_at: new Date().toISOString(),
+      const { data, error } = await supabase.functions.invoke("submit-report", {
+        body: {
+          classification: status,
+          wage_level: wageLevel,
+          education_level: education,
+          honeypot,
+        },
       });
 
       if (error) throw error;
+      if (data?.error) {
+        if (data.error.includes("Too many")) {
+          toast.error("You've submitted too many reports recently. Please try again later.");
+        } else {
+          throw new Error(data.error);
+        }
+        return;
+      }
 
       toast.success("Report submitted! Thank you for contributing.");
       setStatus("");
@@ -56,6 +58,21 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
   return (
     <div className="stat-card border-2 border-transparent" style={{ borderImage: 'linear-gradient(135deg, hsl(45 93% 47%), hsl(36 100% 50%), hsl(45 93% 47%)) 1' }}>
       <h2 className="text-sm font-semibold mb-3">Report Your H1B Lottery Result</h2>
+
+      {/* Honeypot - invisible to users, bots will fill it */}
+      <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, overflow: 'hidden' }}>
+        <label htmlFor="website">Website</label>
+        <input
+          type="text"
+          id="website"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+        />
+      </div>
+
       <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
         {/* Status */}
         <div className="flex-1 space-y-1.5">
