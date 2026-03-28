@@ -1,15 +1,14 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const REDDIT_USER_AGENT = "H1BPulse/1.0 (Lovable App; crowd-sourced H1B tracker)";
+const REDDIT_USER_AGENT = "web:H1BPulse:v1.0 (by /u/h1bpulse_bot)";
 
-// Keyword-based classifier
 const KEYWORDS: Record<string, { patterns: string[]; classification: string }> = {
   selected: {
     patterns: [
       "got selected", "i was selected", "status changed to selected", "been selected",
       "just selected", "finally selected", "selected!", "selected!!", "my status.*selected",
-      "account shows selected", "showing selected", "i got selected",
+      "account shows selected", "showing selected", "i got selected", "we got selected",
     ],
     classification: "selected",
   },
@@ -23,7 +22,7 @@ const KEYWORDS: Record<string, { patterns: string[]; classification: string }> =
   waiting: {
     patterns: [
       "still waiting", "no update", "still submitted", "pending", "anyone else waiting",
-      "status hasn't changed", "status hasnt changed", "no change",
+      "status hasn't changed", "status hasnt changed", "no change", "anyone waiting",
     ],
     classification: "waiting",
   },
@@ -31,7 +30,6 @@ const KEYWORDS: Record<string, { patterns: string[]; classification: string }> =
 
 function classify(text: string): { classification: string; confidence: number } {
   const lower = text.toLowerCase();
-
   for (const [, { patterns, classification }] of Object.entries(KEYWORDS)) {
     for (const pattern of patterns) {
       if (lower.includes(pattern) || new RegExp(pattern, "i").test(lower)) {
@@ -39,15 +37,15 @@ function classify(text: string): { classification: string; confidence: number } 
       }
     }
   }
-
   return { classification: "noise", confidence: 0.5 };
 }
 
-// Extract employer mentions
 const EMPLOYERS = [
   "Google", "Amazon", "Microsoft", "Meta", "Apple", "Netflix", "Tesla",
   "Infosys", "TCS", "Wipro", "Cognizant", "Deloitte", "Accenture",
   "IBM", "Oracle", "Salesforce", "Adobe", "Intel", "Qualcomm", "NVIDIA",
+  "Uber", "Lyft", "Airbnb", "Twitter", "Stripe", "Coinbase", "JPMorgan",
+  "Goldman", "Morgan Stanley", "Capital One", "Walmart", "Target",
 ];
 
 function extractEmployers(text: string): string[] {
@@ -62,14 +60,34 @@ function extractCapType(text: string): string | null {
 }
 
 async function fetchRedditPosts(subreddit: string): Promise<any[]> {
-  const url = `https://www.reddit.com/r/${subreddit}/new.json?limit=25`;
+  // Use old.reddit.com which is more permissive with server-side requests
+  const url = `https://old.reddit.com/r/${subreddit}/new.json?limit=25&raw_json=1`;
+
   const res = await fetch(url, {
-    headers: { "User-Agent": REDDIT_USER_AGENT },
+    headers: {
+      "User-Agent": REDDIT_USER_AGENT,
+      "Accept": "application/json",
+    },
   });
 
   if (!res.ok) {
-    console.error(`Reddit API error: ${res.status} ${res.statusText}`);
-    return [];
+    // Fallback: try www.reddit.com
+    console.log(`old.reddit.com returned ${res.status}, trying www...`);
+    const fallback = await fetch(
+      `https://www.reddit.com/r/${subreddit}/new.json?limit=25&raw_json=1`,
+      {
+        headers: {
+          "User-Agent": REDDIT_USER_AGENT,
+          "Accept": "text/html,application/json",
+        },
+      }
+    );
+    if (!fallback.ok) {
+      console.error(`Reddit fallback also failed: ${fallback.status}`);
+      return [];
+    }
+    const data = await fallback.json();
+    return data?.data?.children?.map((c: any) => c.data) || [];
   }
 
   const data = await res.json();
@@ -99,7 +117,7 @@ Deno.serve(async (req) => {
 
       const signal = {
         source_id: sourceId,
-        source_type: "post",
+        source_type: "post" as const,
         title: post.title || "",
         body: (post.selftext || "").slice(0, 5000),
         permalink: `https://reddit.com${post.permalink}`,
