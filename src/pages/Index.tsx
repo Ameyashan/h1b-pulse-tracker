@@ -6,6 +6,7 @@ import { BreakdownGrid } from "@/components/BreakdownGrid";
 import { ReportFeed } from "@/components/ReportFeed";
 import { ResponsesChart } from "@/components/ResponsesChart";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
+import { StickyBottomBar } from "@/components/StickyBottomBar";
 import { supabase } from "@/integrations/supabase/client";
 import type { Report } from "@/lib/types";
 import { countByStatus } from "@/lib/types";
@@ -57,7 +58,10 @@ export default function Index() {
         <BreakdownGrid reports={reports} />
         <ResponsesChart reports={reports} />
         <ReportFeed reports={reports} />
+        {/* spacer for sticky bottom bar */}
+        <div className="h-20" />
       </main>
+      <StickyBottomBar />
     </div>
   );
 }
