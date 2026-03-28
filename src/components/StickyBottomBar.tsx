@@ -56,9 +56,10 @@ export function StickyBottomBar() {
           />
           <button
             onClick={handleNotify}
-            className="h-10 px-5 rounded-lg bg-green-500 hover:bg-green-400 text-black font-bold text-sm transition-colors whitespace-nowrap"
+            disabled={loading}
+            className="h-10 px-5 rounded-lg bg-green-500 hover:bg-green-400 disabled:opacity-50 text-black font-bold text-sm transition-colors whitespace-nowrap"
           >
-            Notify me
+            {loading ? "..." : "Notify me"}
           </button>
         </div>
       </div>
