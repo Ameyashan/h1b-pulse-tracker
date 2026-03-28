@@ -65,7 +65,7 @@ export function DashboardHeader({ onRefresh }: DashboardHeaderProps) {
               <span className="hidden sm:inline">friends helping each other</span>
             </span>
           )}
-          <Button variant="ghost" size="sm" onClick={onRefresh} className="text-muted-foreground hover:text-foreground">
+          <Button variant="ghost" size="sm" onClick={() => { onRefresh(); refreshVisitors(); }} className="text-muted-foreground hover:text-foreground">
             <RefreshCw className="h-4 w-4 mr-1.5" />
             <span className="hidden sm:inline">Refresh</span>
           </Button>
