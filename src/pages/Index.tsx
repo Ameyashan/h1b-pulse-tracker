@@ -58,7 +58,10 @@ export default function Index() {
         <BreakdownGrid reports={reports} />
         <ResponsesChart reports={reports} />
         <ReportFeed reports={reports} />
+        {/* spacer for sticky bottom bar */}
+        <div className="h-20" />
       </main>
+      <StickyBottomBar />
     </div>
   );
 }
