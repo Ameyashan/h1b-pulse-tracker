@@ -16,17 +16,29 @@ export default function Index() {
 
   const fetchReports = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from("signals")
-        .select("*")
-        .in("classification", ["selected", "not_selected"])
-        .not("wage_level", "is", null)
-        .not("education_level", "is", null)
-        .order("created_utc", { ascending: false })
-        .limit(50000);
+      const PAGE_SIZE = 1000;
+      let allData: Report[] = [];
+      let from = 0;
+      let hasMore = true;
 
-      if (error) throw error;
-      setReports((data || []) as Report[]);
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from("signals")
+          .select("*")
+          .in("classification", ["selected", "not_selected"])
+          .not("wage_level", "is", null)
+          .not("education_level", "is", null)
+          .order("created_utc", { ascending: false })
+          .range(from, from + PAGE_SIZE - 1);
+
+        if (error) throw error;
+        const rows = (data || []) as Report[];
+        allData = allData.concat(rows);
+        hasMore = rows.length === PAGE_SIZE;
+        from += PAGE_SIZE;
+      }
+
+      setReports(allData);
     } catch (err) {
       console.error("Error fetching reports:", err);
     }
