@@ -17,23 +17,15 @@ function BreakdownCard({ label, reports }: { label: string; reports: Report[] })
         <div className="text-sm text-muted-foreground">No data</div>
       ) : (
         <>
-          <div className="flex items-end gap-2 mb-2">
-            <span className="text-2xl font-bold text-selected">{selPct}%</span>
-            <span className="text-xs text-muted-foreground mb-1">selection rate</span>
+          <div className="flex items-center gap-1 mb-1">
+            <span className="text-2xl font-bold text-selected">{counts.selected}</span>
+            <span className="text-2xl font-bold text-muted-foreground">|</span>
+            <span className="text-2xl font-bold text-destructive">{counts.not_selected}</span>
           </div>
-          <div className="h-2 rounded-full bg-secondary overflow-hidden flex mb-3">
+          <div className="text-xs text-muted-foreground mb-3">{selPct}% selection rate</div>
+          <div className="h-2 rounded-full bg-secondary overflow-hidden flex">
             <div className="bg-selected h-full transition-all" style={{ width: `${selPct}%` }} />
             <div className="bg-destructive h-full transition-all" style={{ width: `${100 - selPct}%` }} />
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Selected</span>
-              <span className="font-semibold text-selected">{counts.selected}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Not Selected</span>
-              <span className="font-semibold text-destructive">{counts.not_selected}</span>
-            </div>
           </div>
         </>
       )}
