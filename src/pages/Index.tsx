@@ -22,7 +22,7 @@ export default function Index() {
         .not("wage_level", "is", null)
         .not("education_level", "is", null)
         .order("created_utc", { ascending: false })
-        .limit(500);
+        ;
 
       if (error) throw error;
       setReports((data || []) as Report[]);
