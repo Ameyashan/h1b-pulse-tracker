@@ -1,8 +1,6 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const REDDIT_USER_AGENT = "web:H1BPulse:v1.0 (by /u/h1bpulse_bot)";
-
 const KEYWORDS: Record<string, { patterns: string[]; classification: string }> = {
   selected: {
     patterns: [
@@ -59,41 +57,6 @@ function extractCapType(text: string): string | null {
   return null;
 }
 
-async function fetchRedditPosts(subreddit: string): Promise<any[]> {
-  // Use old.reddit.com which is more permissive with server-side requests
-  const url = `https://old.reddit.com/r/${subreddit}/new.json?limit=25&raw_json=1`;
-
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": REDDIT_USER_AGENT,
-      "Accept": "application/json",
-    },
-  });
-
-  if (!res.ok) {
-    // Fallback: try www.reddit.com
-    console.log(`old.reddit.com returned ${res.status}, trying www...`);
-    const fallback = await fetch(
-      `https://www.reddit.com/r/${subreddit}/new.json?limit=25&raw_json=1`,
-      {
-        headers: {
-          "User-Agent": REDDIT_USER_AGENT,
-          "Accept": "text/html,application/json",
-        },
-      }
-    );
-    if (!fallback.ok) {
-      console.error(`Reddit fallback also failed: ${fallback.status}`);
-      return [];
-    }
-    const data = await fallback.json();
-    return data?.data?.children?.map((c: any) => c.data) || [];
-  }
-
-  const data = await res.json();
-  return data?.data?.children?.map((c: any) => c.data) || [];
-}
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -104,8 +67,17 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const posts = await fetchRedditPosts("h1b");
-    console.log(`Fetched ${posts.length} posts from r/h1b`);
+    // Receive posts from client-side fetch
+    const { posts } = await req.json();
+
+    if (!Array.isArray(posts) || posts.length === 0) {
+      return new Response(
+        JSON.stringify({ success: true, message: "No posts provided", inserted: 0 }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log(`Processing ${posts.length} posts from client`);
 
     let inserted = 0;
     let skipped = 0;
@@ -150,7 +122,7 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
-    console.error("Poll error:", err);
+    console.error("Ingest error:", err);
     return new Response(
       JSON.stringify({ error: String(err) }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
