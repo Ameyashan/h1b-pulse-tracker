@@ -1,6 +1,6 @@
 import { RefreshCw, Activity, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 function useTotalVisitors() {
