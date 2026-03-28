@@ -7,6 +7,7 @@ const KEYWORDS: Record<string, { patterns: string[]; classification: string }> =
       "got selected", "i was selected", "status changed to selected", "been selected",
       "just selected", "finally selected", "selected!", "selected!!", "my status.*selected",
       "account shows selected", "showing selected", "i got selected", "we got selected",
+      "i am selected", "got picked", "i was picked",
     ],
     classification: "selected",
   },
@@ -14,6 +15,7 @@ const KEYWORDS: Record<string, { patterns: string[]; classification: string }> =
     patterns: [
       "not selected", "wasn't selected", "wasnt selected", "not been selected",
       "rejected", "denial", "didn't get selected", "didnt get selected",
+      "not picked", "wasn't picked", "wasnt picked",
     ],
     classification: "not_selected",
   },
@@ -21,6 +23,7 @@ const KEYWORDS: Record<string, { patterns: string[]; classification: string }> =
     patterns: [
       "still waiting", "no update", "still submitted", "pending", "anyone else waiting",
       "status hasn't changed", "status hasnt changed", "no change", "anyone waiting",
+      "waiting to hear", "haven't heard", "havent heard", "any update",
     ],
     classification: "waiting",
   },
@@ -67,21 +70,14 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Receive posts from client-side fetch
-    const { posts } = await req.json();
+    const { posts = [], comments = [] } = await req.json();
 
-    if (!Array.isArray(posts) || posts.length === 0) {
-      return new Response(
-        JSON.stringify({ success: true, message: "No posts provided", inserted: 0 }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    console.log(`Processing ${posts.length} posts from client`);
+    console.log(`Processing ${posts.length} posts and ${comments.length} comments`);
 
     let inserted = 0;
     let skipped = 0;
 
+    // Process posts
     for (const post of posts) {
       const sourceId = `reddit_post_${post.id}`;
       const fullText = `${post.title} ${post.selftext || ""}`;
@@ -110,7 +106,43 @@ Deno.serve(async (req) => {
         .upsert(signal, { onConflict: "source_id", ignoreDuplicates: true });
 
       if (error) {
-        console.error(`Error inserting ${sourceId}:`, error.message);
+        console.error(`Error inserting post ${sourceId}:`, error.message);
+        skipped++;
+      } else {
+        inserted++;
+      }
+    }
+
+    // Process comments
+    for (const comment of comments) {
+      const sourceId = `reddit_comment_${comment.id}`;
+      const fullText = `${comment._parent_post_title || ""} ${comment.body || ""}`;
+      const { classification, confidence } = classify(fullText);
+
+      const signal = {
+        source_id: sourceId,
+        source_type: "comment" as const,
+        title: comment._parent_post_title || "(comment)",
+        body: (comment.body || "").slice(0, 5000),
+        permalink: `https://reddit.com${comment.permalink}`,
+        author: comment.author || "[deleted]",
+        created_utc: new Date(comment.created_utc * 1000).toISOString(),
+        score: comment.score || 0,
+        flair: null,
+        classification,
+        confidence,
+        employer_mentions: extractEmployers(fullText),
+        cap_type: extractCapType(fullText),
+        extracted_at: new Date().toISOString(),
+        raw_json: comment,
+      };
+
+      const { error } = await supabase
+        .from("signals")
+        .upsert(signal, { onConflict: "source_id", ignoreDuplicates: true });
+
+      if (error) {
+        console.error(`Error inserting comment ${sourceId}:`, error.message);
         skipped++;
       } else {
         inserted++;
@@ -118,7 +150,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, fetched: posts.length, inserted, skipped }),
+      JSON.stringify({ success: true, fetched: posts.length + comments.length, inserted, skipped }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
