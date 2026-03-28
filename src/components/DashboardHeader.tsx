@@ -1,22 +1,24 @@
 import { RefreshCw, Activity, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 function useTotalVisitors() {
   const [count, setCount] = useState<number | null>(null);
 
+  const refresh = useCallback(async () => {
+    const { data } = await supabase
+      .from("app_config")
+      .select("value")
+      .eq("key", "visitor_count")
+      .single();
+    if (data) setCount(Number(data.value));
+  }, []);
+
   useEffect(() => {
     const increment = async () => {
-      // Check sessionStorage so we only count once per session
       if (sessionStorage.getItem("h1b_counted")) {
-        // Just read the current value
-        const { data } = await supabase
-          .from("app_config")
-          .select("value")
-          .eq("key", "visitor_count")
-          .single();
-        if (data) setCount(Number(data.value));
+        refresh();
         return;
       }
 
@@ -27,9 +29,9 @@ function useTotalVisitors() {
       }
     };
     increment();
-  }, []);
+  }, [refresh]);
 
-  return count;
+  return { count, refresh };
 }
 
 interface DashboardHeaderProps {
@@ -39,7 +41,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ onRefresh }: DashboardHeaderProps) {
-  const totalVisitors = useTotalVisitors();
+  const { count: totalVisitors, refresh: refreshVisitors } = useTotalVisitors();
 
   return (
     <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
@@ -63,7 +65,7 @@ export function DashboardHeader({ onRefresh }: DashboardHeaderProps) {
               <span className="hidden sm:inline">friends helping each other</span>
             </span>
           )}
-          <Button variant="ghost" size="sm" onClick={onRefresh} className="text-muted-foreground hover:text-foreground">
+          <Button variant="ghost" size="sm" onClick={() => { onRefresh(); refreshVisitors(); }} className="text-muted-foreground hover:text-foreground">
             <RefreshCw className="h-4 w-4 mr-1.5" />
             <span className="hidden sm:inline">Refresh</span>
           </Button>
