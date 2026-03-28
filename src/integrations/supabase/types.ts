@@ -103,7 +103,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_visitor_count: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never

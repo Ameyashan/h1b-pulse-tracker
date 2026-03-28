@@ -3,29 +3,30 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-function usePresenceCount() {
-  const [count, setCount] = useState(1);
+function useTotalVisitors() {
+  const [count, setCount] = useState<number | null>(null);
 
   useEffect(() => {
-    const id = crypto.randomUUID();
-    const channel = supabase.channel("online-users", {
-      config: { presence: { key: id } },
-    });
+    const increment = async () => {
+      // Check sessionStorage so we only count once per session
+      if (sessionStorage.getItem("h1b_counted")) {
+        // Just read the current value
+        const { data } = await supabase
+          .from("app_config")
+          .select("value")
+          .eq("key", "visitor_count")
+          .single();
+        if (data) setCount(Number(data.value));
+        return;
+      }
 
-    channel
-      .on("presence", { event: "sync" }, () => {
-        const state = channel.presenceState();
-        setCount(Object.keys(state).length);
-      })
-      .subscribe(async (status) => {
-        if (status === "SUBSCRIBED") {
-          await channel.track({ user_id: id, online_at: new Date().toISOString() });
-        }
-      });
-
-    return () => {
-      supabase.removeChannel(channel);
+      const { data, error } = await supabase.rpc("increment_visitor_count");
+      if (!error && data != null) {
+        setCount(Number(data));
+        sessionStorage.setItem("h1b_counted", "1");
+      }
     };
+    increment();
   }, []);
 
   return count;
@@ -38,7 +39,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ onRefresh }: DashboardHeaderProps) {
-  const onlineCount = usePresenceCount();
+  const totalVisitors = useTotalVisitors();
 
   return (
     <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
@@ -55,10 +56,13 @@ export function DashboardHeader({ onRefresh }: DashboardHeaderProps) {
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Users className="h-3.5 w-3.5 text-primary" />
-            <span className="text-primary font-semibold">{onlineCount}</span> friends helping each other
-          </span>
+          {totalVisitors !== null && (
+            <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Users className="h-3.5 w-3.5 text-primary" />
+              <span className="text-primary font-semibold">{totalVisitors.toLocaleString()}</span>
+              <span className="hidden sm:inline">friends helping each other</span>
+            </span>
+          )}
           <Button variant="ghost" size="sm" onClick={onRefresh} className="text-muted-foreground hover:text-foreground">
             <RefreshCw className="h-4 w-4 mr-1.5" />
             <span className="hidden sm:inline">Refresh</span>
