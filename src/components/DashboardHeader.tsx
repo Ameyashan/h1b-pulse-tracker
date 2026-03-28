@@ -41,7 +41,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ onRefresh }: DashboardHeaderProps) {
-  const totalVisitors = useTotalVisitors();
+  const { count: totalVisitors, refresh: refreshVisitors } = useTotalVisitors();
 
   return (
     <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
