@@ -43,6 +43,7 @@ export type Database = {
           classification: string
           confidence: number
           created_utc: string
+          education_level: string | null
           employer_mentions: string[]
           extracted_at: string
           flair: string | null
@@ -53,6 +54,7 @@ export type Database = {
           source_id: string
           source_type: string
           title: string
+          wage_level: string | null
         }
         Insert: {
           author?: string
@@ -61,6 +63,7 @@ export type Database = {
           classification?: string
           confidence?: number
           created_utc?: string
+          education_level?: string | null
           employer_mentions?: string[]
           extracted_at?: string
           flair?: string | null
@@ -71,6 +74,7 @@ export type Database = {
           source_id: string
           source_type: string
           title?: string
+          wage_level?: string | null
         }
         Update: {
           author?: string
@@ -79,6 +83,7 @@ export type Database = {
           classification?: string
           confidence?: number
           created_utc?: string
+          education_level?: string | null
           employer_mentions?: string[]
           extracted_at?: string
           flair?: string | null
@@ -89,6 +94,7 @@ export type Database = {
           source_id?: string
           source_type?: string
           title?: string
+          wage_level?: string | null
         }
         Relationships: []
       }
