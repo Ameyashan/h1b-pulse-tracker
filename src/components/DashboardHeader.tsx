@@ -6,17 +6,19 @@ import { supabase } from "@/integrations/supabase/client";
 function useTotalVisitors() {
   const [count, setCount] = useState<number | null>(null);
 
+  const refresh = useCallback(async () => {
+    const { data } = await supabase
+      .from("app_config")
+      .select("value")
+      .eq("key", "visitor_count")
+      .single();
+    if (data) setCount(Number(data.value));
+  }, []);
+
   useEffect(() => {
     const increment = async () => {
-      // Check sessionStorage so we only count once per session
       if (sessionStorage.getItem("h1b_counted")) {
-        // Just read the current value
-        const { data } = await supabase
-          .from("app_config")
-          .select("value")
-          .eq("key", "visitor_count")
-          .single();
-        if (data) setCount(Number(data.value));
+        refresh();
         return;
       }
 
@@ -27,9 +29,9 @@ function useTotalVisitors() {
       }
     };
     increment();
-  }, []);
+  }, [refresh]);
 
-  return count;
+  return { count, refresh };
 }
 
 interface DashboardHeaderProps {
