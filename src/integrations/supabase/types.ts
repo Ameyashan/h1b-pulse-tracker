@@ -14,7 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      app_config: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      signals: {
+        Row: {
+          author: string
+          body: string
+          cap_type: string | null
+          classification: string
+          confidence: number
+          created_utc: string
+          employer_mentions: string[]
+          extracted_at: string
+          flair: string | null
+          id: string
+          permalink: string
+          raw_json: Json | null
+          score: number
+          source_id: string
+          source_type: string
+          title: string
+        }
+        Insert: {
+          author?: string
+          body?: string
+          cap_type?: string | null
+          classification?: string
+          confidence?: number
+          created_utc?: string
+          employer_mentions?: string[]
+          extracted_at?: string
+          flair?: string | null
+          id?: string
+          permalink?: string
+          raw_json?: Json | null
+          score?: number
+          source_id: string
+          source_type: string
+          title?: string
+        }
+        Update: {
+          author?: string
+          body?: string
+          cap_type?: string | null
+          classification?: string
+          confidence?: number
+          created_utc?: string
+          employer_mentions?: string[]
+          extracted_at?: string
+          flair?: string | null
+          id?: string
+          permalink?: string
+          raw_json?: Json | null
+          score?: number
+          source_id?: string
+          source_type?: string
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
