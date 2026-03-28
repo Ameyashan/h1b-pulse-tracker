@@ -21,8 +21,7 @@ export default function Index() {
         .in("classification", ["selected", "not_selected"])
         .not("wage_level", "is", null)
         .not("education_level", "is", null)
-        .order("created_utc", { ascending: false })
-        ;
+        .order("created_utc", { ascending: false });
 
       if (error) throw error;
       setReports((data || []) as Report[]);
