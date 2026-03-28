@@ -1,17 +1,31 @@
 import { useState } from "react";
 import { ClipboardList } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export function StickyBottomBar() {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleNotify = () => {
+  const handleNotify = async () => {
     if (!email || !email.includes("@")) {
       toast.error("Please enter a valid email address");
       return;
     }
-    toast.success("You'll be notified when petition tracking launches!");
-    setEmail("");
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from("notification_emails")
+        .insert({ email: email.trim() });
+      if (error) throw error;
+      toast.success("You'll be notified when petition tracking launches!");
+      setEmail("");
+    } catch (err) {
+      console.error("Failed to save email:", err);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,9 +56,10 @@ export function StickyBottomBar() {
           />
           <button
             onClick={handleNotify}
-            className="h-10 px-5 rounded-lg bg-green-500 hover:bg-green-400 text-black font-bold text-sm transition-colors whitespace-nowrap"
+            disabled={loading}
+            className="h-10 px-5 rounded-lg bg-green-500 hover:bg-green-400 disabled:opacity-50 text-black font-bold text-sm transition-colors whitespace-nowrap"
           >
-            Notify me
+            {loading ? "..." : "Notify me"}
           </button>
         </div>
       </div>
