@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { StatsCards } from "@/components/StatsCards";
 import { TimeBreakdown } from "@/components/TimeBreakdown";
@@ -8,16 +8,17 @@ import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { DEMO_SIGNALS, getSignalsByTimeWindow, countByClassification } from "@/lib/demo-data";
 import type { Signal } from "@/lib/demo-data";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAndIngestRedditPosts } from "@/lib/reddit-client";
 import { AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Index() {
   const [adminOpen, setAdminOpen] = useState(false);
   const [signals, setSignals] = useState<Signal[]>(DEMO_SIGNALS);
   const [isDemoMode, setIsDemoMode] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const hasPolled = useRef(false);
 
   const fetchSignals = useCallback(async () => {
-    setLoading(true);
     try {
       const { data, error } = await supabase
         .from("signals")
@@ -37,46 +38,63 @@ export default function Index() {
       }
     } catch (err) {
       console.error("Error fetching signals:", err);
-      // Stay in demo mode
-    } finally {
-      setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    fetchSignals();
-    // Auto-refresh every 2 minutes
-    const interval = setInterval(fetchSignals, 2 * 60 * 1000);
-    return () => clearInterval(interval);
+  const pollReddit = useCallback(async () => {
+    try {
+      const result = await fetchAndIngestRedditPosts();
+      if (result.success && result.inserted > 0) {
+        toast.success(`Ingested ${result.inserted} new signals from Reddit`);
+        await fetchSignals();
+      } else if (result.success) {
+        toast.info("No new posts from Reddit");
+      } else {
+        toast.error(`Reddit fetch failed: ${result.error}`);
+      }
+    } catch (err) {
+      console.error("Poll error:", err);
+    }
   }, [fetchSignals]);
+
+  useEffect(() => {
+    // Load existing signals from DB
+    fetchSignals();
+
+    // Auto-poll Reddit on first load (client-side)
+    if (!hasPolled.current) {
+      hasPolled.current = true;
+      pollReddit();
+    }
+
+    // Re-poll every 10 minutes
+    const interval = setInterval(pollReddit, 10 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [fetchSignals, pollReddit]);
 
   const signals24h = getSignalsByTimeWindow(signals, 24);
   const counts24h = countByClassification(signals24h);
   const total24h = signals24h.filter(s => s.classification !== "noise").length;
 
   const lastSignal = signals[0];
-  const lastUpdated = lastSignal
-    ? getTimeAgo(new Date(lastSignal.created_utc))
-    : "N/A";
+  const lastUpdated = lastSignal ? getTimeAgo(new Date(lastSignal.created_utc)) : "N/A";
+
+  const handleRefresh = useCallback(async () => {
+    toast.info("Fetching latest from Reddit...");
+    await pollReddit();
+  }, [pollReddit]);
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader isDemoMode={isDemoMode} onRefresh={fetchSignals} onToggleAdmin={() => setAdminOpen(true)} />
+      <DashboardHeader isDemoMode={isDemoMode} onRefresh={handleRefresh} onToggleAdmin={() => setAdminOpen(true)} />
 
       <main className="container px-4 py-5 space-y-4 max-w-6xl">
         {isDemoMode && (
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-3 flex items-start gap-3">
             <AlertTriangle className="h-4 w-4 text-accent shrink-0 mt-0.5" />
             <p className="text-xs text-muted-foreground leading-relaxed">
-              <strong className="text-accent">Demo Mode active.</strong> Showing synthetic data.
-              To go live: register a Reddit app at{" "}
-              <a href="https://www.reddit.com/prefs/apps" target="_blank" rel="noopener noreferrer" className="text-primary underline">
-                reddit.com/prefs/apps
-              </a>
-              , then set{" "}
-              <code className="bg-secondary px-1 rounded text-accent">REDDIT_CLIENT_ID</code> and{" "}
-              <code className="bg-secondary px-1 rounded text-accent">REDDIT_CLIENT_SECRET</code> in your environment and turn off Demo Mode in{" "}
-              <button onClick={() => setAdminOpen(true)} className="text-primary underline">Admin</button>.
+              <strong className="text-accent">Demo Mode active.</strong> Showing synthetic data while fetching live posts from Reddit.
+              Data is fetched client-side and classified automatically.
             </p>
           </div>
         )}
