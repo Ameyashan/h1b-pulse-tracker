@@ -1,0 +1,1 @@
+UPDATE public.app_config SET value = '149'::jsonb WHERE key = 'visitor_count';
