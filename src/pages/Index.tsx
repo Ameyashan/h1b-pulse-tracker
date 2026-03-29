@@ -7,6 +7,8 @@ import { ReportFeed } from "@/components/ReportFeed";
 import { ResponsesChart } from "@/components/ResponsesChart";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { StickyBottomBar } from "@/components/StickyBottomBar";
+import { PetitionTrackerTab } from "@/components/PetitionTrackerTab";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import type { Report } from "@/lib/types";
 import { countByStatus } from "@/lib/types";
@@ -46,7 +48,6 @@ export default function Index() {
 
   useEffect(() => {
     fetchReports();
-    // Subscribe to realtime inserts
     const channel = supabase
       .channel("signals-realtime")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "signals" }, () => {
@@ -64,15 +65,34 @@ export default function Index() {
     <div className="min-h-screen bg-background">
       <DashboardHeader isDemoMode={false} onRefresh={fetchReports} onToggleAdmin={() => {}} />
 
-      <main className="container px-4 py-5 space-y-4 max-w-5xl">
-        <ReportForm onSubmitted={fetchReports} />
-        <DisclaimerBanner />
-        <StatsCards selected={counts.selected} notSelected={counts.not_selected} total={total} />
-        <BreakdownGrid reports={reports} />
-        <ResponsesChart reports={reports} />
-        <ReportFeed reports={reports} />
-        {/* spacer for sticky bottom bar */}
-        <div className="h-20" />
+      <main className="container px-4 py-5 max-w-5xl">
+        <Tabs defaultValue="lottery" className="w-full">
+          <TabsList className="w-full grid grid-cols-2 mb-4">
+            <TabsTrigger value="lottery" className="text-sm font-semibold">
+              🎲 Lottery Tracker
+            </TabsTrigger>
+            <TabsTrigger value="petition" className="text-sm font-semibold">
+              📋 Petition Tracker
+              <span className="ml-1.5 text-[10px] font-bold rounded-full bg-primary/15 text-primary px-2 py-0.5 leading-none">
+                Apr 4
+              </span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="lottery" className="space-y-4">
+            <ReportForm onSubmitted={fetchReports} />
+            <DisclaimerBanner />
+            <StatsCards selected={counts.selected} notSelected={counts.not_selected} total={total} />
+            <BreakdownGrid reports={reports} />
+            <ResponsesChart reports={reports} />
+            <ReportFeed reports={reports} />
+            <div className="h-20" />
+          </TabsContent>
+
+          <TabsContent value="petition">
+            <PetitionTrackerTab />
+          </TabsContent>
+        </Tabs>
       </main>
       <StickyBottomBar />
     </div>
