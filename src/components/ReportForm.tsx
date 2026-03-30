@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, XCircle, Send } from "lucide-react";
+import { CheckCircle2, XCircle, Send, PartyPopper, Bell, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,11 +16,38 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
   const [education, setEducation] = useState<EducationLevel | "">("");
   const [honeypot, setHoneypot] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showCongrats, setShowCongrats] = useState(false);
+  const [congratsEmail, setCongratsEmail] = useState("");
+  const [congratsLoading, setCongratsLoading] = useState(false);
+  const [congratsSubmitted, setCongratsSubmitted] = useState(false);
 
   const canSubmit = status && wageLevel && education && !submitting;
 
+  const handleCongratsNotify = async () => {
+    if (!congratsEmail || !congratsEmail.includes("@")) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    setCongratsLoading(true);
+    try {
+      const { error } = await supabase
+        .from("notification_emails")
+        .insert({ email: congratsEmail.trim() });
+      if (error) throw error;
+      toast.success("You'll be notified when petition tracking launches!");
+      setCongratsSubmitted(true);
+      setTimeout(() => setShowCongrats(false), 2500);
+    } catch (err) {
+      console.error("Failed to save email:", err);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setCongratsLoading(false);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!canSubmit) return;
+    const wasSelected = status === "selected";
     setSubmitting(true);
     try {
       const { data, error } = await supabase.functions.invoke("submit-report", {
@@ -47,6 +74,12 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
       setWageLevel("");
       setEducation("");
       onSubmitted();
+
+      if (wasSelected) {
+        setShowCongrats(true);
+        setCongratsEmail("");
+        setCongratsSubmitted(false);
+      }
     } catch (err) {
       console.error("Submit error:", err);
       toast.error("Failed to submit report. Please try again.");
