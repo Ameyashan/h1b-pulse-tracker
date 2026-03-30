@@ -1,7 +1,7 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const MAX_SUBMISSIONS_PER_HOUR = 3;
+const MAX_SUBMISSIONS_PER_HOUR = 5;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
