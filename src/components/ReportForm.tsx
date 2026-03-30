@@ -80,8 +80,18 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
         setCongratsEmail("");
         setCongratsSubmitted(false);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Submit error:", err);
+      // Handle rate limit (429) or other non-2xx responses
+      if (err?.name === "FunctionsHttpError") {
+        try {
+          const errorBody = await err.context?.json?.();
+          if (errorBody?.error?.includes("Too many")) {
+            toast.error("You've already submitted a report from this device. Only one report per person is allowed.");
+            return;
+          }
+        } catch {}
+      }
       toast.error("Failed to submit report. Please try again.");
     } finally {
       setSubmitting(false);
