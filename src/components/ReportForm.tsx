@@ -89,16 +89,16 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
   };
 
   return (
-    <div className="stat-card border-2 border-transparent relative overflow-hidden" style={{ borderImage: 'linear-gradient(135deg, hsl(45 93% 47%), hsl(36 100% 50%), hsl(45 93% 47%)) 1' }}>
+    <div className="stat-card border-2 border-transparent relative" style={{ borderImage: 'linear-gradient(135deg, hsl(45 93% 47%), hsl(36 100% 50%), hsl(45 93% 47%)) 1' }}>
       {showCongrats && (
-        <div className="absolute inset-0 z-10 bg-background/95 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
+        <div className="absolute inset-0 z-10 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-300" style={{ minHeight: 'fit-content' }}>
           <button
             onClick={() => setShowCongrats(false)}
-            className="absolute top-2 right-2 p-1 rounded-full hover:bg-muted text-muted-foreground"
+            className="absolute top-3 right-3 p-1 rounded-full hover:bg-muted text-muted-foreground"
           >
             <X className="h-4 w-4" />
           </button>
-          <div className="text-center space-y-3 max-w-sm">
+          <div className="text-center space-y-2 max-w-sm">
             <PartyPopper className="h-8 w-8 text-selected mx-auto" />
             <h3 className="text-base font-bold text-foreground">
               Congratulations on your selection! 🎉
