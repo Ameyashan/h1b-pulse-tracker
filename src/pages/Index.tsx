@@ -45,8 +45,7 @@ export default function Index() {
             .then((result) => {
               clearTimeout(timer);
               resolve(result);
-            })
-            .catch((err) => {
+            }, (err) => {
               clearTimeout(timer);
               reject(err);
             });
