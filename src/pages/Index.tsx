@@ -12,7 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import type { Report } from "@/lib/types";
 import { countByStatus } from "@/lib/types";
-import { cacheReports, getCachedReports, STATIC_FALLBACK_SUMMARY } from "@/lib/fallback-data";
+import { cacheReports, getCachedReports, getStaticFallbackReports } from "@/lib/fallback-data";
 
 export default function Index() {
   const [reports, setReports] = useState<Report[]>([]);
