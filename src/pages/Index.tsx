@@ -12,9 +12,12 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import type { Report } from "@/lib/types";
 import { countByStatus } from "@/lib/types";
+import { cacheReports, getCachedReports, STATIC_FALLBACK_SUMMARY } from "@/lib/fallback-data";
 
 export default function Index() {
   const [reports, setReports] = useState<Report[]>([]);
+  const [usingFallback, setUsingFallback] = useState(false);
+  const [fallbackType, setFallbackType] = useState<"cache" | "static" | null>(null);
 
   const fetchReports = useCallback(async () => {
     try {
@@ -41,8 +44,24 @@ export default function Index() {
       }
 
       setReports(allData);
+      setUsingFallback(false);
+      setFallbackType(null);
+      cacheReports(allData);
     } catch (err) {
       console.error("Error fetching reports:", err);
+      // Fallback 1: localStorage cache
+      const cached = getCachedReports();
+      if (cached && cached.length > 0) {
+        setReports(cached);
+        setUsingFallback(true);
+        setFallbackType("cache");
+        return;
+      }
+      // Fallback 2: static snapshot (no individual reports, just summary)
+      if (reports.length === 0) {
+        setUsingFallback(true);
+        setFallbackType("static");
+      }
     }
   }, []);
 
@@ -55,11 +74,24 @@ export default function Index() {
       })
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    // Retry every 30s if using fallback
+    const retryInterval = setInterval(() => {
+      if (document.hidden) return;
+      fetchReports();
+    }, 30000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(retryInterval);
+    };
   }, [fetchReports]);
 
-  const counts = countByStatus(reports);
-  const total = reports.length;
+  const counts = usingFallback && fallbackType === "static"
+    ? { selected: STATIC_FALLBACK_SUMMARY.selected, not_selected: STATIC_FALLBACK_SUMMARY.notSelected }
+    : countByStatus(reports);
+  const total = usingFallback && fallbackType === "static"
+    ? STATIC_FALLBACK_SUMMARY.total
+    : reports.length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,12 +112,22 @@ export default function Index() {
           </TabsList>
 
           <TabsContent value="lottery" className="space-y-4">
+            {usingFallback && (
+              <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-200 flex items-center gap-2">
+                <span>⚠️</span>
+                <span>
+                  {fallbackType === "cache"
+                    ? "Showing cached data — live connection is temporarily unavailable. Auto-retrying…"
+                    : "Showing last known summary — live connection is temporarily unavailable. Auto-retrying…"}
+                </span>
+              </div>
+            )}
             <ReportForm onSubmitted={fetchReports} />
             <DisclaimerBanner />
             <StatsCards selected={counts.selected} notSelected={counts.not_selected} total={total} />
-            <BreakdownGrid reports={reports} />
-            <ResponsesChart reports={reports} />
-            <ReportFeed reports={reports} />
+            {fallbackType !== "static" && <BreakdownGrid reports={reports} />}
+            {fallbackType !== "static" && <ResponsesChart reports={reports} />}
+            {fallbackType !== "static" && <ReportFeed reports={reports} />}
             <div className="h-20" />
           </TabsContent>
 
