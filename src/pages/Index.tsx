@@ -112,12 +112,22 @@ export default function Index() {
           </TabsList>
 
           <TabsContent value="lottery" className="space-y-4">
+            {usingFallback && (
+              <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-200 flex items-center gap-2">
+                <span>⚠️</span>
+                <span>
+                  {fallbackType === "cache"
+                    ? "Showing cached data — live connection is temporarily unavailable. Auto-retrying…"
+                    : "Showing last known summary — live connection is temporarily unavailable. Auto-retrying…"}
+                </span>
+              </div>
+            )}
             <ReportForm onSubmitted={fetchReports} />
             <DisclaimerBanner />
             <StatsCards selected={counts.selected} notSelected={counts.not_selected} total={total} />
-            <BreakdownGrid reports={reports} />
-            <ResponsesChart reports={reports} />
-            <ReportFeed reports={reports} />
+            {fallbackType !== "static" && <BreakdownGrid reports={reports} />}
+            {fallbackType !== "static" && <ResponsesChart reports={reports} />}
+            {fallbackType !== "static" && <ReportFeed reports={reports} />}
             <div className="h-20" />
           </TabsContent>
 
