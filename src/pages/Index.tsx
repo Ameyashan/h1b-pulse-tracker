@@ -59,7 +59,8 @@ export default function Index() {
           setFallbackType("cache");
           return;
         }
-        // No cache either — use static fallback
+        // No cache either — use static fallback with synthetic reports
+        setReports(getStaticFallbackReports());
         setUsingFallback(true);
         setFallbackType("static");
         return;
