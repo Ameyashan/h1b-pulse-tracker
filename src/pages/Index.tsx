@@ -50,21 +50,25 @@ export default function Index() {
         from += PAGE_SIZE;
       }
 
-      // Guard: if we previously had data and now get 0, treat as outage
-      const cached = getCachedReports();
-      if (allData.length === 0 && cached && cached.length > 0) {
-        setReports(cached);
+      // Guard: if we get 0 results, check for fallbacks before accepting
+      if (allData.length === 0) {
+        const cached = getCachedReports();
+        if (cached && cached.length > 0) {
+          setReports(cached);
+          setUsingFallback(true);
+          setFallbackType("cache");
+          return;
+        }
+        // No cache either — use static fallback
         setUsingFallback(true);
-        setFallbackType("cache");
+        setFallbackType("static");
         return;
       }
 
       setReports(allData);
       setUsingFallback(false);
       setFallbackType(null);
-      if (allData.length > 0) {
-        cacheReports(allData);
-      }
+      cacheReports(allData);
     } catch (err) {
       console.error("Error fetching reports:", err);
       // Fallback 1: localStorage cache
