@@ -79,7 +79,8 @@ export default function Index() {
         setFallbackType("cache");
         return;
       }
-      // Fallback 2: static snapshot
+      // Fallback 2: static snapshot with synthetic reports
+      setReports(getStaticFallbackReports());
       setUsingFallback(true);
       setFallbackType("static");
     }
