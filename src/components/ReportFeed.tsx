@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { Search, Filter } from "lucide-react";
+import { Filter } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import type { Report, ReportStatus } from "@/lib/types";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
+
+const PAGE_SIZE = 50;
 
 function ReportRow({ report }: { report: Report }) {
   const isSelected = report.classification === "selected";
@@ -47,11 +50,22 @@ export function ReportFeed({ reports }: ReportFeedProps) {
   const [filter, setFilter] = useState<"all" | ReportStatus>("all");
   const [levelFilter, setLevelFilter] = useState<string>("all");
   const [eduFilter, setEduFilter] = useState<string>("all");
+  const [page, setPage] = useState(1);
 
   const filtered = reports
     .filter(r => filter === "all" || r.classification === filter)
     .filter(r => levelFilter === "all" || r.wage_level === levelFilter)
     .filter(r => eduFilter === "all" || r.education_level === eduFilter);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paged = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  // Reset to page 1 when filters change
+  const handleFilterChange = (setter: (v: string) => void) => (v: string) => {
+    setter(v);
+    setPage(1);
+  };
 
   return (
     <div>
@@ -64,7 +78,7 @@ export function ReportFeed({ reports }: ReportFeedProps) {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+          <Select value={filter} onValueChange={handleFilterChange(v => setFilter(v as typeof filter))}>
             <SelectTrigger className="w-[120px] h-8 text-xs bg-card border-border">
               <SelectValue />
             </SelectTrigger>
@@ -74,7 +88,7 @@ export function ReportFeed({ reports }: ReportFeedProps) {
               <SelectItem value="not_selected">Not Selected</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={levelFilter} onValueChange={setLevelFilter}>
+          <Select value={levelFilter} onValueChange={handleFilterChange(setLevelFilter)}>
             <SelectTrigger className="w-[110px] h-8 text-xs bg-card border-border">
               <SelectValue />
             </SelectTrigger>
@@ -86,7 +100,7 @@ export function ReportFeed({ reports }: ReportFeedProps) {
               <SelectItem value="4">Level 4</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={eduFilter} onValueChange={setEduFilter}>
+          <Select value={eduFilter} onValueChange={handleFilterChange(setEduFilter)}>
             <SelectTrigger className="w-[120px] h-8 text-xs bg-card border-border">
               <SelectValue />
             </SelectTrigger>
@@ -100,7 +114,7 @@ export function ReportFeed({ reports }: ReportFeedProps) {
         </div>
       </div>
       <div className="space-y-2">
-        {filtered.map(report => (
+        {paged.map(report => (
           <ReportRow key={report.id} report={report} />
         ))}
         {filtered.length === 0 && (
@@ -109,6 +123,33 @@ export function ReportFeed({ reports }: ReportFeedProps) {
           </div>
         )}
       </div>
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-border">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="gap-1"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Previous
+          </Button>
+          <span className="text-sm text-muted-foreground px-3">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="gap-1"
+          >
+            Next
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
