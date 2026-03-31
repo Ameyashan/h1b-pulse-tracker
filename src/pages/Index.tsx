@@ -143,9 +143,9 @@ export default function Index() {
             <ReportForm onSubmitted={fetchReports} />
             <DisclaimerBanner />
             <StatsCards selected={counts.selected} notSelected={counts.not_selected} total={total} />
-            {fallbackType !== "static" && <BreakdownGrid reports={reports} />}
-            {fallbackType !== "static" && <ResponsesChart reports={reports} />}
-            {fallbackType !== "static" && <ReportFeed reports={reports} />}
+            <BreakdownGrid reports={reports} />
+            <ResponsesChart reports={reports} />
+            <ReportFeed reports={reports} />
             <div className="h-20" />
           </TabsContent>
 
