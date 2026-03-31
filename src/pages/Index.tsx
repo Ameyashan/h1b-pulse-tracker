@@ -26,8 +26,13 @@ export default function Index() {
       let from = 0;
       let hasMore = true;
 
+      // Add a timeout to detect hung connections
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Fetch timeout")), 10000)
+      );
+
       while (hasMore) {
-        const { data, error } = await supabase
+        const queryPromise = supabase
           .from("signals")
           .select("*")
           .in("classification", ["selected", "not_selected"])
@@ -36,11 +41,28 @@ export default function Index() {
           .order("created_utc", { ascending: false })
           .range(from, from + PAGE_SIZE - 1);
 
+        const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
+
         if (error) throw error;
         const rows = (data || []) as Report[];
         allData = allData.concat(rows);
         hasMore = rows.length === PAGE_SIZE;
         from += PAGE_SIZE;
+      }
+
+      // Guard: if we get 0 results, check for fallbacks before accepting
+      if (allData.length === 0) {
+        const cached = getCachedReports();
+        if (cached && cached.length > 0) {
+          setReports(cached);
+          setUsingFallback(true);
+          setFallbackType("cache");
+          return;
+        }
+        // No cache either — use static fallback
+        setUsingFallback(true);
+        setFallbackType("static");
+        return;
       }
 
       setReports(allData);
@@ -57,11 +79,9 @@ export default function Index() {
         setFallbackType("cache");
         return;
       }
-      // Fallback 2: static snapshot (no individual reports, just summary)
-      if (reports.length === 0) {
-        setUsingFallback(true);
-        setFallbackType("static");
-      }
+      // Fallback 2: static snapshot
+      setUsingFallback(true);
+      setFallbackType("static");
     }
   }, []);
 
