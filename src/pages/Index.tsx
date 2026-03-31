@@ -32,16 +32,27 @@ export default function Index() {
       );
 
       while (hasMore) {
-        const queryPromise = supabase
-          .from("signals")
-          .select("*")
-          .in("classification", ["selected", "not_selected"])
-          .not("wage_level", "is", null)
-          .not("education_level", "is", null)
-          .order("created_utc", { ascending: false })
-          .range(from, from + PAGE_SIZE - 1);
+        const fetchWithTimeout = new Promise<{ data: any; error: any }>((resolve, reject) => {
+          const timer = setTimeout(() => reject(new Error("Fetch timeout")), 10000);
+          supabase
+            .from("signals")
+            .select("*")
+            .in("classification", ["selected", "not_selected"])
+            .not("wage_level", "is", null)
+            .not("education_level", "is", null)
+            .order("created_utc", { ascending: false })
+            .range(from, from + PAGE_SIZE - 1)
+            .then((result) => {
+              clearTimeout(timer);
+              resolve(result);
+            })
+            .catch((err) => {
+              clearTimeout(timer);
+              reject(err);
+            });
+        });
 
-        const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
+        const { data, error } = await fetchWithTimeout;
 
         if (error) throw error;
         const rows = (data || []) as Report[];
