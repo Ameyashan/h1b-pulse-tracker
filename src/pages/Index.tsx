@@ -108,12 +108,8 @@ export default function Index() {
     };
   }, [fetchReports]);
 
-  const counts = usingFallback && fallbackType === "static"
-    ? { selected: STATIC_FALLBACK_SUMMARY.selected, not_selected: STATIC_FALLBACK_SUMMARY.notSelected }
-    : countByStatus(reports);
-  const total = usingFallback && fallbackType === "static"
-    ? STATIC_FALLBACK_SUMMARY.total
-    : reports.length;
+  const counts = countByStatus(reports);
+  const total = reports.length;
 
   return (
     <div className="min-h-screen bg-background">
