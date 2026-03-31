@@ -12,7 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import type { Report } from "@/lib/types";
 import { countByStatus } from "@/lib/types";
-import { cacheReports, getCachedReports, STATIC_FALLBACK_SUMMARY } from "@/lib/fallback-data";
+import { cacheReports, getCachedReports, getStaticFallbackReports } from "@/lib/fallback-data";
 
 export default function Index() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -26,22 +26,28 @@ export default function Index() {
       let from = 0;
       let hasMore = true;
 
-      // Add a timeout to detect hung connections
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Fetch timeout")), 10000)
-      );
 
       while (hasMore) {
-        const queryPromise = supabase
-          .from("signals")
-          .select("*")
-          .in("classification", ["selected", "not_selected"])
-          .not("wage_level", "is", null)
-          .not("education_level", "is", null)
-          .order("created_utc", { ascending: false })
-          .range(from, from + PAGE_SIZE - 1);
+        const fetchWithTimeout = new Promise<{ data: any; error: any }>((resolve, reject) => {
+          const timer = setTimeout(() => reject(new Error("Fetch timeout")), 10000);
+          supabase
+            .from("signals")
+            .select("*")
+            .in("classification", ["selected", "not_selected"])
+            .not("wage_level", "is", null)
+            .not("education_level", "is", null)
+            .order("created_utc", { ascending: false })
+            .range(from, from + PAGE_SIZE - 1)
+            .then((result) => {
+              clearTimeout(timer);
+              resolve(result);
+            }, (err) => {
+              clearTimeout(timer);
+              reject(err);
+            });
+        });
 
-        const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
+        const { data, error } = await fetchWithTimeout;
 
         if (error) throw error;
         const rows = (data || []) as Report[];
@@ -59,7 +65,8 @@ export default function Index() {
           setFallbackType("cache");
           return;
         }
-        // No cache either — use static fallback
+        // No cache either — use static fallback with synthetic reports
+        setReports(getStaticFallbackReports());
         setUsingFallback(true);
         setFallbackType("static");
         return;
@@ -79,7 +86,8 @@ export default function Index() {
         setFallbackType("cache");
         return;
       }
-      // Fallback 2: static snapshot
+      // Fallback 2: static snapshot with synthetic reports
+      setReports(getStaticFallbackReports());
       setUsingFallback(true);
       setFallbackType("static");
     }
@@ -106,12 +114,8 @@ export default function Index() {
     };
   }, [fetchReports]);
 
-  const counts = usingFallback && fallbackType === "static"
-    ? { selected: STATIC_FALLBACK_SUMMARY.selected, not_selected: STATIC_FALLBACK_SUMMARY.notSelected }
-    : countByStatus(reports);
-  const total = usingFallback && fallbackType === "static"
-    ? STATIC_FALLBACK_SUMMARY.total
-    : reports.length;
+  const counts = countByStatus(reports);
+  const total = reports.length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -145,9 +149,9 @@ export default function Index() {
             <ReportForm onSubmitted={fetchReports} />
             <DisclaimerBanner />
             <StatsCards selected={counts.selected} notSelected={counts.not_selected} total={total} />
-            {fallbackType !== "static" && <BreakdownGrid reports={reports} />}
-            {fallbackType !== "static" && <ResponsesChart reports={reports} />}
-            {fallbackType !== "static" && <ReportFeed reports={reports} />}
+            <BreakdownGrid reports={reports} />
+            <ResponsesChart reports={reports} />
+            <ReportFeed reports={reports} />
             <div className="h-20" />
           </TabsContent>
 
