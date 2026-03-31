@@ -26,8 +26,13 @@ export default function Index() {
       let from = 0;
       let hasMore = true;
 
+      // Add a timeout to detect hung connections
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Fetch timeout")), 10000)
+      );
+
       while (hasMore) {
-        const { data, error } = await supabase
+        const queryPromise = supabase
           .from("signals")
           .select("*")
           .in("classification", ["selected", "not_selected"])
@@ -36,6 +41,8 @@ export default function Index() {
           .order("created_utc", { ascending: false })
           .range(from, from + PAGE_SIZE - 1);
 
+        const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
+
         if (error) throw error;
         const rows = (data || []) as Report[];
         allData = allData.concat(rows);
@@ -43,10 +50,21 @@ export default function Index() {
         from += PAGE_SIZE;
       }
 
+      // Guard: if we previously had data and now get 0, treat as outage
+      const cached = getCachedReports();
+      if (allData.length === 0 && cached && cached.length > 0) {
+        setReports(cached);
+        setUsingFallback(true);
+        setFallbackType("cache");
+        return;
+      }
+
       setReports(allData);
       setUsingFallback(false);
       setFallbackType(null);
-      cacheReports(allData);
+      if (allData.length > 0) {
+        cacheReports(allData);
+      }
     } catch (err) {
       console.error("Error fetching reports:", err);
       // Fallback 1: localStorage cache
@@ -57,11 +75,9 @@ export default function Index() {
         setFallbackType("cache");
         return;
       }
-      // Fallback 2: static snapshot (no individual reports, just summary)
-      if (reports.length === 0) {
-        setUsingFallback(true);
-        setFallbackType("static");
-      }
+      // Fallback 2: static snapshot
+      setUsingFallback(true);
+      setFallbackType("static");
     }
   }, []);
 
