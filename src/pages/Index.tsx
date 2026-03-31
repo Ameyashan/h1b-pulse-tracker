@@ -26,10 +26,6 @@ export default function Index() {
       let from = 0;
       let hasMore = true;
 
-      // Add a timeout to detect hung connections
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Fetch timeout")), 10000)
-      );
 
       while (hasMore) {
         const fetchWithTimeout = new Promise<{ data: any; error: any }>((resolve, reject) => {
