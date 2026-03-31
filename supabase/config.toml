@@ -2,3 +2,6 @@ project_id = "wxvzllkvjtewlwiohgxi"
 
 [api]
 max_rows = 50000
+
+[functions.process-email-queue]
+verify_jwt = true
