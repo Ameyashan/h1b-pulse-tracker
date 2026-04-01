@@ -93,6 +93,10 @@ export default function Index() {
             <div className="h-20" />
           </TabsContent>
 
+          <TabsContent value="nextsteps">
+            <NextStepsTab />
+          </TabsContent>
+
           <TabsContent value="petition">
             <PetitionTrackerTab />
           </TabsContent>
