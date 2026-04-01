@@ -224,6 +224,11 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
           </Select>
         </div>
 
+        {/* Law Firm */}
+        <div className="sm:w-48">
+          <LawFirmCombobox value={lawFirm} onChange={setLawFirm} />
+        </div>
+
         {/* Submit */}
         <Button
           onClick={handleSubmit}
