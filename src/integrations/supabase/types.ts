@@ -153,6 +153,7 @@ export type Database = {
           extracted_at: string
           flair: string | null
           id: string
+          law_firm: string | null
           permalink: string
           raw_json: Json | null
           score: number
@@ -173,6 +174,7 @@ export type Database = {
           extracted_at?: string
           flair?: string | null
           id?: string
+          law_firm?: string | null
           permalink?: string
           raw_json?: Json | null
           score?: number
@@ -193,6 +195,7 @@ export type Database = {
           extracted_at?: string
           flair?: string | null
           id?: string
+          law_firm?: string | null
           permalink?: string
           raw_json?: Json | null
           score?: number
