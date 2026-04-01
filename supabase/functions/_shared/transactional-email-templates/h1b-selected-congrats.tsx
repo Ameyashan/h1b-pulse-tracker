@@ -14,7 +14,7 @@ const H1bSelectedCongratsEmail = () => (
       <Container style={container}>
         <Section style={heroSection}>
           <Heading style={h1}>
-            Congratulations!
+            🎉 Congratulations!
           </Heading>
           <Text style={heroText}>
             Your H-1B petition has been selected in the FY2026 lottery!
