@@ -76,6 +76,7 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
       setStatus("");
       setWageLevel("");
       setEducation("");
+      setLawFirm("");
       onSubmitted();
 
       if (wasSelected) {
