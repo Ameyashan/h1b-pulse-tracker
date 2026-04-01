@@ -6,20 +6,15 @@ import type { TemplateEntry } from './registry.ts'
 
 const SITE_NAME = "H1B Pulse"
 
-interface H1bCongratsProps {
-  name?: string
-}
-
-const H1bSelectedCongratsEmail = ({ name }: H1bCongratsProps) => (
+const H1bSelectedCongratsEmail = () => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>🎉 Congratulations on your H-1B selection! Check out what's next.</Preview>
+    <Preview>Congratulations on your H-1B selection! Check out what's next.</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={heroSection}>
-          <Text style={emoji}>🎉</Text>
           <Heading style={h1}>
-            {name ? `Congratulations, ${name}!` : 'Congratulations!'}
+            Congratulations!
           </Heading>
           <Text style={heroText}>
             Your H-1B petition has been selected in the FY2026 lottery!
@@ -29,19 +24,19 @@ const H1bSelectedCongratsEmail = ({ name }: H1bCongratsProps) => (
         <Hr style={divider} />
 
         <Text style={text}>
-          This is a huge milestone — you're one step closer to securing your H-1B visa. We know the process ahead can feel overwhelming, so we've put together a comprehensive guide to help you navigate what comes next.
+          This is a huge milestone and you're one step closer to securing your H-1B visa. We know the process ahead can feel overwhelming, so we've put together a comprehensive guide to help you navigate what comes next.
         </Text>
 
         <Section style={featureBox}>
-          <Heading style={h2}>✨ New: "Next Steps" Tab</Heading>
+          <Heading style={h2}>New: "Next Steps" Tab</Heading>
           <Text style={featureText}>
             We've added a brand new <strong>Next Steps</strong> tab to H1B Pulse with a complete roadmap covering:
           </Text>
-          <Text style={listItem}>📋 Document preparation checklist</Text>
-          <Text style={listItem}>📅 Key filing deadlines & timeline</Text>
-          <Text style={listItem}>💰 Understanding fees & premium processing</Text>
-          <Text style={listItem}>⚖️ RFE preparation tips</Text>
-          <Text style={listItem}>📊 What to expect after filing</Text>
+          <Text style={listItem}>Document preparation checklist</Text>
+          <Text style={listItem}>Key filing deadlines and timeline</Text>
+          <Text style={listItem}>Understanding fees and premium processing</Text>
+          <Text style={listItem}>RFE preparation tips</Text>
+          <Text style={listItem}>What to expect after filing</Text>
         </Section>
 
         <Section style={ctaSection}>
@@ -55,7 +50,7 @@ const H1bSelectedCongratsEmail = ({ name }: H1bCongratsProps) => (
         </Text>
 
         <Text style={footer}>
-          — The {SITE_NAME} Team
+          The {SITE_NAME} Team
         </Text>
       </Container>
     </Body>
