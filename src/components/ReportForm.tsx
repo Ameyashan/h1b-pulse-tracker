@@ -57,6 +57,7 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
           classification: status,
           wage_level: wageLevel,
           education_level: education,
+          law_firm: lawFirm || null,
           honeypot,
         },
       });
