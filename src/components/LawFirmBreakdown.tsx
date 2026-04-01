@@ -73,7 +73,7 @@ export function LawFirmBreakdown({ reports }: LawFirmBreakdownProps) {
     : firms;
   const totalFirms = firms.length;
 
-  if (firms.length === 0) return null;
+  const hasFirms = firms.length > 0;
 
   return (
     <div className="space-y-3">
