@@ -59,9 +59,9 @@ const H1bSelectedCongratsEmail = () => (
 
 export const template = {
   component: H1bSelectedCongratsEmail,
-  subject: '🎉 Congrats on your H-1B selection! Here\'s what to do next',
+  subject: 'Congrats on your H-1B selection! Here\'s what to do next',
   displayName: 'H-1B Selection Congratulations',
-  previewData: { name: 'Ameya' },
+  previewData: {},
 } satisfies TemplateEntry
 
 const main = { backgroundColor: '#ffffff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }
