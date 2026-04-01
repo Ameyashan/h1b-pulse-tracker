@@ -105,45 +105,53 @@ export function LawFirmBreakdown({ reports }: LawFirmBreakdownProps) {
         </div>
       </div>
 
-      {/* Top 4 Cards */}
-      {top4.length > 0 && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {top4.map((firm) => (
-            <FirmCard key={firm.name} firm={firm} />
-          ))}
+      {hasFirms ? (
+        <>
+          {/* Top 4 Cards */}
+          {top4.length > 0 && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {top4.map((firm) => (
+                <FirmCard key={firm.name} firm={firm} />
+              ))}
+            </div>
+          )}
+
+          {/* Table */}
+          <div className="stat-card overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-2.5 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Law Firm</th>
+                    <th className="text-left py-2.5 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Reports</th>
+                    <th className="text-left py-2.5 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Selected</th>
+                    <th className="text-left py-2.5 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Not Selected</th>
+                    <th className="text-right py-2.5 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Selection Rate</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.slice(0, 20).map((firm) => (
+                    <tr key={firm.name} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
+                      <td className="py-2.5 px-3 font-medium text-foreground">{firm.name}</td>
+                      <td className="py-2.5 px-3 text-muted-foreground">{firm.total}</td>
+                      <td className="py-2.5 px-3 text-selected font-semibold">{firm.selected}</td>
+                      <td className="py-2.5 px-3 text-destructive font-semibold">{firm.notSelected}</td>
+                      <td className="py-2.5 px-3 text-right"><RateBadge rate={firm.selectionRate} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="text-center py-3 text-xs text-muted-foreground border-t border-border">
+              Showing top {Math.min(filtered.length, 20)} firms by report volume · {totalFirms} firms tracked · Report yours above to add data
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="stat-card text-center py-8">
+          <p className="text-sm text-muted-foreground">No law firm data yet. Be the first to report yours using the form above!</p>
         </div>
       )}
-
-      {/* Table */}
-      <div className="stat-card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="text-left py-2.5 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Law Firm</th>
-                <th className="text-left py-2.5 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Reports</th>
-                <th className="text-left py-2.5 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Selected</th>
-                <th className="text-left py-2.5 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Not Selected</th>
-                <th className="text-right py-2.5 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Selection Rate</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.slice(0, 20).map((firm) => (
-                <tr key={firm.name} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
-                  <td className="py-2.5 px-3 font-medium text-foreground">{firm.name}</td>
-                  <td className="py-2.5 px-3 text-muted-foreground">{firm.total}</td>
-                  <td className="py-2.5 px-3 text-selected font-semibold">{firm.selected}</td>
-                  <td className="py-2.5 px-3 text-destructive font-semibold">{firm.notSelected}</td>
-                  <td className="py-2.5 px-3 text-right"><RateBadge rate={firm.selectionRate} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="text-center py-3 text-xs text-muted-foreground border-t border-border">
-          Showing top {Math.min(filtered.length, 20)} firms by report volume · {totalFirms} firms tracked · Report yours above to add data
-        </div>
-      </div>
     </div>
   );
 }
