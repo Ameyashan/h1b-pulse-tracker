@@ -1,5 +1,6 @@
 import type { Report } from "@/lib/types";
 import { countByStatus } from "@/lib/types";
+import { LawFirmBreakdown } from "@/components/LawFirmBreakdown";
 
 interface BreakdownGridProps {
   reports: Report[];
