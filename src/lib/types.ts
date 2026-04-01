@@ -17,6 +17,7 @@ export interface Report {
   permalink: string;
   source_type: string;
   source_id: string;
+  law_firm?: string | null;
 }
 
 export function getReportsByTimeWindow(reports: Report[], hours: number) {
