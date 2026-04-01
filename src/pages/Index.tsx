@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { ReportForm } from "@/components/ReportForm";
 import { StatsCards } from "@/components/StatsCards";
@@ -15,7 +16,18 @@ import type { Report } from "@/lib/types";
 import { countByStatus } from "@/lib/types";
 
 export default function Index() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [reports, setReports] = useState<Report[]>([]);
+
+  const TAB_MAP: Record<string, string> = { "/": "lottery", "/next-steps": "nextsteps", "/petition-tracker": "petition" };
+  const PATH_MAP: Record<string, string> = { lottery: "/", nextsteps: "/next-steps", petition: "/petition-tracker" };
+  const activeTab = useMemo(() => TAB_MAP[location.pathname] || "lottery", [location.pathname]);
+
+  const handleTabChange = (value: string) => {
+    const path = PATH_MAP[value] || "/";
+    if (location.pathname !== path) navigate(path, { replace: true });
+  };
 
   const fetchReports = useCallback(async () => {
     try {
@@ -67,7 +79,7 @@ export default function Index() {
       <DashboardHeader isDemoMode={false} onRefresh={fetchReports} onToggleAdmin={() => {}} />
 
       <main className="container px-4 py-5 max-w-5xl">
-        <Tabs defaultValue="lottery" className="w-full">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="w-full grid grid-cols-3 mb-4">
             <TabsTrigger value="lottery" className="text-sm font-semibold">
               🎲 Lottery Tracker
