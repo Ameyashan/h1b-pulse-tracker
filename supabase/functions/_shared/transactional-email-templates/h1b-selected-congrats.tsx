@@ -32,11 +32,11 @@ const H1bSelectedCongratsEmail = () => (
           <Text style={featureText}>
             We've added a brand new <strong>Next Steps</strong> tab to H1B Pulse with a complete roadmap covering:
           </Text>
-          <Text style={listItem}>Document preparation checklist</Text>
-          <Text style={listItem}>Key filing deadlines and timeline</Text>
-          <Text style={listItem}>Understanding fees and premium processing</Text>
-          <Text style={listItem}>RFE preparation tips</Text>
-          <Text style={listItem}>What to expect after filing</Text>
+          <Text style={listItem}>📋 Document preparation checklist</Text>
+          <Text style={listItem}>📅 Key filing deadlines and timeline</Text>
+          <Text style={listItem}>💰 Understanding fees and premium processing</Text>
+          <Text style={listItem}>⚖️ RFE preparation tips</Text>
+          <Text style={listItem}>📊 What to expect after filing</Text>
         </Section>
 
         <Section style={ctaSection}>
