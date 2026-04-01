@@ -80,16 +80,18 @@ export default function Index() {
 
       <main className="container px-4 py-5 max-w-5xl">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="w-full grid grid-cols-3 mb-4">
-            <TabsTrigger value="lottery" className="text-sm font-semibold">
-              🎲 Lottery Tracker
+          <TabsList className="w-full grid grid-cols-3 mb-4 h-auto">
+            <TabsTrigger value="lottery" className="text-xs sm:text-sm font-semibold px-1 sm:px-3 py-2">
+              <span className="hidden sm:inline">🎲 </span>Lottery
+              <span className="hidden sm:inline"> Tracker</span>
             </TabsTrigger>
-            <TabsTrigger value="nextsteps" className="text-sm font-semibold">
-              🗺️ Next Steps
+            <TabsTrigger value="nextsteps" className="text-xs sm:text-sm font-semibold px-1 sm:px-3 py-2">
+              <span className="hidden sm:inline">🗺️ </span>Next Steps
             </TabsTrigger>
-            <TabsTrigger value="petition" className="text-sm font-semibold">
-              📋 Petition Tracker
-              <span className="ml-1.5 text-[10px] font-bold rounded-full bg-primary/15 text-primary px-2 py-0.5 leading-none">
+            <TabsTrigger value="petition" className="text-xs sm:text-sm font-semibold px-1 sm:px-3 py-2">
+              <span className="hidden sm:inline">📋 </span>Petition
+              <span className="hidden sm:inline"> Tracker</span>
+              <span className="ml-1 text-[9px] sm:text-[10px] font-bold rounded-full bg-primary/15 text-primary px-1.5 sm:px-2 py-0.5 leading-none">
                 Apr 4
               </span>
             </TabsTrigger>
