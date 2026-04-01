@@ -14,7 +14,7 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const body = await req.json();
-    const { classification, wage_level, education_level, honeypot } = body;
+    const { classification, wage_level, education_level, law_firm, honeypot } = body;
 
     // Honeypot check - if filled, silently succeed (don't reveal it's a trap)
     if (honeypot) {
@@ -72,6 +72,7 @@ Deno.serve(async (req) => {
       classification,
       wage_level,
       education_level,
+      law_firm: law_firm || null,
       title: `${classification === "selected" ? "Selected" : "Not Selected"} — Level ${wage_level}, ${education_level}`,
       body: "",
       permalink: "",

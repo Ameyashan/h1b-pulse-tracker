@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CheckCircle2, XCircle, Send, PartyPopper, Bell, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LawFirmCombobox } from "@/components/LawFirmCombobox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { WageLevel, EducationLevel, ReportStatus } from "@/lib/types";
@@ -14,6 +15,7 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
   const [status, setStatus] = useState<ReportStatus | "">("");
   const [wageLevel, setWageLevel] = useState<WageLevel | "">("");
   const [education, setEducation] = useState<EducationLevel | "">("");
+  const [lawFirm, setLawFirm] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [showCongrats, setShowCongrats] = useState(false);
@@ -55,6 +57,7 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
           classification: status,
           wage_level: wageLevel,
           education_level: education,
+          law_firm: lawFirm || null,
           honeypot,
         },
       });
@@ -73,6 +76,7 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
       setStatus("");
       setWageLevel("");
       setEducation("");
+      setLawFirm("");
       onSubmitted();
 
       if (wasSelected) {
@@ -218,6 +222,11 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
               <SelectItem value="Other">Other</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        {/* Law Firm */}
+        <div className="sm:w-48">
+          <LawFirmCombobox value={lawFirm} onChange={setLawFirm} />
         </div>
 
         {/* Submit */}

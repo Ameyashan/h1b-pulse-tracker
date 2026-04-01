@@ -1,0 +1,1 @@
+ALTER TABLE public.signals ADD COLUMN law_firm TEXT DEFAULT NULL;
