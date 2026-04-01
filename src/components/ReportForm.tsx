@@ -15,6 +15,7 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
   const [status, setStatus] = useState<ReportStatus | "">("");
   const [wageLevel, setWageLevel] = useState<WageLevel | "">("");
   const [education, setEducation] = useState<EducationLevel | "">("");
+  const [lawFirm, setLawFirm] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [showCongrats, setShowCongrats] = useState(false);
