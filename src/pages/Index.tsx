@@ -8,6 +8,7 @@ import { ResponsesChart } from "@/components/ResponsesChart";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { StickyBottomBar } from "@/components/StickyBottomBar";
 import { PetitionTrackerTab } from "@/components/PetitionTrackerTab";
+import { NextStepsTab } from "@/components/NextStepsTab";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import type { Report } from "@/lib/types";
