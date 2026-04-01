@@ -68,9 +68,12 @@ export default function Index() {
 
       <main className="container px-4 py-5 max-w-5xl">
         <Tabs defaultValue="lottery" className="w-full">
-          <TabsList className="w-full grid grid-cols-2 mb-4">
+          <TabsList className="w-full grid grid-cols-3 mb-4">
             <TabsTrigger value="lottery" className="text-sm font-semibold">
               🎲 Lottery Tracker
+            </TabsTrigger>
+            <TabsTrigger value="nextsteps" className="text-sm font-semibold">
+              🗺️ Next Steps
             </TabsTrigger>
             <TabsTrigger value="petition" className="text-sm font-semibold">
               📋 Petition Tracker
