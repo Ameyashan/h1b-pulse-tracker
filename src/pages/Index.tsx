@@ -8,6 +8,7 @@ import { ResponsesChart } from "@/components/ResponsesChart";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { StickyBottomBar } from "@/components/StickyBottomBar";
 import { PetitionTrackerTab } from "@/components/PetitionTrackerTab";
+import { NextStepsTab } from "@/components/NextStepsTab";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import type { Report } from "@/lib/types";
@@ -67,9 +68,12 @@ export default function Index() {
 
       <main className="container px-4 py-5 max-w-5xl">
         <Tabs defaultValue="lottery" className="w-full">
-          <TabsList className="w-full grid grid-cols-2 mb-4">
+          <TabsList className="w-full grid grid-cols-3 mb-4">
             <TabsTrigger value="lottery" className="text-sm font-semibold">
               🎲 Lottery Tracker
+            </TabsTrigger>
+            <TabsTrigger value="nextsteps" className="text-sm font-semibold">
+              🗺️ Next Steps
             </TabsTrigger>
             <TabsTrigger value="petition" className="text-sm font-semibold">
               📋 Petition Tracker
@@ -87,6 +91,10 @@ export default function Index() {
             <ResponsesChart reports={reports} />
             <ReportFeed reports={reports} />
             <div className="h-20" />
+          </TabsContent>
+
+          <TabsContent value="nextsteps">
+            <NextStepsTab />
           </TabsContent>
 
           <TabsContent value="petition">
