@@ -65,6 +65,7 @@ export function BreakdownGrid({ reports }: BreakdownGridProps) {
           ))}
         </div>
       </div>
+      <LawFirmBreakdown reports={reports} />
     </div>
   );
 }

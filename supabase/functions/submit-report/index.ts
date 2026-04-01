@@ -72,6 +72,7 @@ Deno.serve(async (req) => {
       classification,
       wage_level,
       education_level,
+      law_firm: law_firm || null,
       title: `${classification === "selected" ? "Selected" : "Not Selected"} — Level ${wage_level}, ${education_level}`,
       body: "",
       permalink: "",
