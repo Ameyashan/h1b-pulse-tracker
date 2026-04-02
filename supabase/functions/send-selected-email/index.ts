@@ -18,7 +18,7 @@ const EMAIL_HTML = `<!DOCTYPE html>
           <tr>
             <td style="background:linear-gradient(135deg,#DBEAFE 0%,#D1FAE5 50%,#FEF9C3 100%);padding:48px 40px 36px;text-align:center;">
               <div style="font-size:48px;line-height:1.2;margin-bottom:16px;">🎉🇺🇸🎊</div>
-              <h1 style="margin:0;font-size:28px;font-weight:800;color:#1E293B;line-height:1.3;">Congratulations!</h1>
+              <h1 style="margin:0;font-size:28px;font-weight:800;color:#111827;line-height:1.3;">Congratulations!</h1>
               <p style="margin:12px 0 0;font-size:18px;color:#2563EB;font-weight:600;">Your H-1B petition was selected in the lottery.</p>
             </td>
           </tr>
@@ -70,7 +70,7 @@ const EMAIL_HTML = `<!DOCTYPE html>
           </tr>
           <tr>
             <td style="padding:8px 40px 36px;text-align:center;">
-              <a href="https://h1bpulse.com?utm_source=email&utm_medium=selected&utm_campaign=next_steps" target="_blank" style="display:inline-block;background-color:#2563EB;color:#FFFFFF;font-size:16px;font-weight:700;text-decoration:none;padding:16px 40px;border-radius:10px;letter-spacing:0.3px;">View Your Next Steps →</a>
+              <a href="https://h1bpulse.com/next-steps?utm_source=email&utm_medium=selected&utm_campaign=next_steps" target="_blank" style="display:inline-block;background-color:#2563EB;color:#FFFFFF;font-size:16px;font-weight:700;text-decoration:none;padding:16px 40px;border-radius:10px;letter-spacing:0.3px;">View Your Next Steps →</a>
               <p style="margin:16px 0 0;font-size:13px;color:#64748B;">Takes 2 minutes to review your personalized checklist</p>
             </td>
           </tr>
