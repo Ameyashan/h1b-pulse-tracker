@@ -18,7 +18,7 @@ const EMAIL_HTML = `<!DOCTYPE html>
           <tr>
             <td style="background:linear-gradient(135deg,#DBEAFE 0%,#D1FAE5 50%,#FEF9C3 100%);padding:48px 40px 36px;text-align:center;">
               <div style="font-size:48px;line-height:1.2;margin-bottom:16px;">🎉🇺🇸🎊</div>
-              <h1 style="margin:0;font-size:28px;font-weight:800;color:#1E293B;line-height:1.3;">Congratulations!</h1>
+              <h1 style="margin:0;font-size:28px;font-weight:800;color:#111827;line-height:1.3;">Congratulations!</h1>
               <p style="margin:12px 0 0;font-size:18px;color:#2563EB;font-weight:600;">Your H-1B petition was selected in the lottery.</p>
             </td>
           </tr>
