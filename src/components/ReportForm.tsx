@@ -36,15 +36,23 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
     }
     setCongratsLoading(true);
     try {
-      const { error } = await supabase
+      // Save email to notification_emails table
+      const { error: dbError } = await supabase
         .from("notification_emails")
         .insert({ email: congratsEmail.trim() });
+      if (dbError) console.error("Failed to save email:", dbError);
+
+      // Send congratulations email via Resend
+      const { data, error } = await supabase.functions.invoke("send-selected-email", {
+        body: { email: congratsEmail.trim() },
+      });
       if (error) throw error;
-      toast.success("You'll be notified when petition tracking launches!");
+
+      toast.success("Congrats email sent! Check your inbox 🎉");
       setCongratsSubmitted(true);
       setTimeout(() => setShowCongrats(false), 2500);
     } catch (err) {
-      console.error("Failed to save email:", err);
+      console.error("Failed to send congrats email:", err);
       toast.error("Something went wrong. Please try again.");
     } finally {
       setCongratsLoading(false);
