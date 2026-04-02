@@ -22,6 +22,10 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
   const [congratsEmail, setCongratsEmail] = useState("");
   const [congratsLoading, setCongratsLoading] = useState(false);
   const [congratsSubmitted, setCongratsSubmitted] = useState(false);
+  const [showSorry, setShowSorry] = useState(false);
+  const [sorryEmail, setSorryEmail] = useState("");
+  const [sorryLoading, setSorryLoading] = useState(false);
+  const [sorrySubmitted, setSorrySubmitted] = useState(false);
 
   const canSubmit = status && wageLevel && education && !submitting;
 
