@@ -51,6 +51,28 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
     }
   };
 
+  const handleSorryNotify = async () => {
+    if (!sorryEmail || !sorryEmail.includes("@")) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    setSorryLoading(true);
+    try {
+      const { error } = await supabase
+        .from("not_selected_emails")
+        .insert({ email: sorryEmail.trim() });
+      if (error) throw error;
+      toast.success("We'll keep you updated with next steps!");
+      setSorrySubmitted(true);
+      setTimeout(() => setShowSorry(false), 2500);
+    } catch (err) {
+      console.error("Failed to save email:", err);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setSorryLoading(false);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!canSubmit) return;
     const wasSelected = status === "selected";
