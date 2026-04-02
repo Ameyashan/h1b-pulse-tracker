@@ -177,6 +177,49 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
           </div>
         </div>
       )}
+      {showSorry && (
+        <div className="absolute inset-0 z-10 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-300" style={{ minHeight: 'fit-content' }}>
+          <button
+            onClick={() => setShowSorry(false)}
+            className="absolute top-3 right-3 p-1 rounded-full hover:bg-muted text-muted-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+          <div className="text-center space-y-2 max-w-sm">
+            <span className="text-3xl block">💛</span>
+            <h3 className="text-base font-bold text-foreground">
+              We're sorry this wasn't your year.
+            </h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              But don't worry, we're here to help. Drop your email and we'll send you <strong className="text-foreground">next steps</strong>, including alternative visa options and how to connect with experienced immigration attorneys.
+            </p>
+            {sorrySubmitted ? (
+              <div className="flex items-center justify-center gap-2 text-sm text-primary font-medium py-2">
+                <Bell className="w-4 h-4" />
+                We'll keep you updated!
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={sorryEmail}
+                  onChange={(e) => setSorryEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSorryNotify()}
+                  className="flex-1 h-9 rounded-lg border border-border/60 bg-muted/40 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+                <button
+                  onClick={handleSorryNotify}
+                  disabled={sorryLoading}
+                  className="h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground font-bold text-sm transition-colors whitespace-nowrap"
+                >
+                  {sorryLoading ? "..." : "Keep Me Updated"}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       <h2 className="text-sm font-semibold mb-3">Report Your H1B Lottery Result</h2>
 
       {/* Honeypot - invisible to users, bots will fill it */}
