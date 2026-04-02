@@ -109,6 +109,10 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
         setShowCongrats(true);
         setCongratsEmail("");
         setCongratsSubmitted(false);
+      } else {
+        setShowSorry(true);
+        setSorryEmail("");
+        setSorrySubmitted(false);
       }
     } catch (err: any) {
       console.error("Submit error:", err);
