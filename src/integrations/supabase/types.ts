@@ -122,6 +122,24 @@ export type Database = {
         }
         Relationships: []
       }
+      not_selected_emails: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+        }
+        Relationships: []
+      }
       notification_emails: {
         Row: {
           created_at: string
