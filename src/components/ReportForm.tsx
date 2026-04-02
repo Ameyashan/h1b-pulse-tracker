@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, XCircle, Send, PartyPopper, Bell, X } from "lucide-react";
+import { CheckCircle2, XCircle, Send, PartyPopper, Bell, X, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LawFirmCombobox } from "@/components/LawFirmCombobox";
