@@ -18,6 +18,7 @@ interface PetitionEntry {
   wage_level: string;
   education: string;
   job_category: string | null;
+  law_firm: string | null;
   filing_date: string | null;
   email: string | null;
   created_at: string;
