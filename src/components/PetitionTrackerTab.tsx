@@ -185,7 +185,7 @@ export function PetitionTrackerTab() {
         service_center: center,
         wage_level: wage,
         education,
-        
+        law_firm: lawFirm || null,
         filing_date: filingDate ? format(filingDate, "MMM d") : null,
       });
       if (error) throw error;
