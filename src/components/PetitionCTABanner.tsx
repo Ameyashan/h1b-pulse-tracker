@@ -6,7 +6,7 @@ interface PetitionCTABannerProps {
 
 export function PetitionCTABanner({ onNavigate }: PetitionCTABannerProps) {
   return (
-    <div className="rounded-xl border border-border/60 bg-gradient-to-r from-card to-card/80 p-4 sm:p-5 flex items-center justify-between gap-4">
+    <div className="rounded-xl border-2 border-primary/60 bg-gradient-to-r from-card to-card/80 p-4 sm:p-5 flex items-center justify-between gap-4 animate-pulse-border">
       <div className="space-y-0.5">
         <p className="font-semibold text-foreground text-sm sm:text-base">
           Selected in the FY2027 lottery?
