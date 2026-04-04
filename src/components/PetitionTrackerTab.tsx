@@ -241,7 +241,7 @@ export function PetitionTrackerTab() {
       const { error } = await supabase.from("petition_entries").update({
         status: editStatus, processing_type: editProcessing, service_center: editCenter,
         wage_level: editWage, education: editEducation,
-        job_category: null, filing_date: editFiling || null, updated_at: new Date().toISOString(),
+        job_category: null, law_firm: editLawFirm || null, filing_date: editFiling || null, updated_at: new Date().toISOString(),
       }).eq("update_code", lookupEntry.update_code);
       if (error) throw error;
       toast.success("Petition updated!");
