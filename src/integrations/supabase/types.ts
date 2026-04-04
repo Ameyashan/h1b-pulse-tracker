@@ -166,6 +166,7 @@ export type Database = {
           filing_date: string | null
           id: string
           job_category: string | null
+          law_firm: string | null
           processing_type: string
           service_center: string
           status: string
@@ -180,6 +181,7 @@ export type Database = {
           filing_date?: string | null
           id?: string
           job_category?: string | null
+          law_firm?: string | null
           processing_type?: string
           service_center: string
           status?: string
@@ -194,6 +196,7 @@ export type Database = {
           filing_date?: string | null
           id?: string
           job_category?: string | null
+          law_firm?: string | null
           processing_type?: string
           service_center?: string
           status?: string
