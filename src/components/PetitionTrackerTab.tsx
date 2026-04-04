@@ -478,7 +478,7 @@ export function PetitionTrackerTab() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border/40">
-                  {["STATUS", "DAYS", "TYPE", "CENTER", "CATEGORY", "WAGE", "WHEN"].map((h) => (
+                  {["STATUS", "DAYS", "TYPE", "CENTER", "WAGE", "WHEN"].map((h) => (
                     <th key={h} className="text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground px-4 py-3 text-left font-medium">{h}</th>
                   ))}
                 </tr>
