@@ -503,7 +503,7 @@ export function PetitionTrackerTab() {
                         <td className="px-4 py-3 font-mono text-foreground">{daysSince(e.created_at)}</td>
                         <td className="px-4 py-3 text-muted-foreground capitalize">{e.processing_type}</td>
                         <td className="px-4 py-3 text-muted-foreground capitalize">{e.service_center}</td>
-                        <td className="px-4 py-3 text-muted-foreground">{e.job_category || "—"}</td>
+                        
                         <td className="px-4 py-3 text-muted-foreground">{WAGE_OPTIONS.find((w) => w.value === e.wage_level)?.label || e.wage_level}</td>
                         <td className="px-4 py-3 text-muted-foreground">{relativeTime(e.created_at)}</td>
                       </tr>
