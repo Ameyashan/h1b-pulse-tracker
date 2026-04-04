@@ -55,12 +55,20 @@ export function ReportFeed({ reports }: ReportFeedProps) {
   const [filter, setFilter] = useState<"all" | ReportStatus>("all");
   const [levelFilter, setLevelFilter] = useState<string>("all");
   const [eduFilter, setEduFilter] = useState<string>("all");
+  const [firmFilter, setFirmFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
+
+  const lawFirms = useMemo(() => {
+    const firms = new Set<string>();
+    reports.forEach(r => { if (r.law_firm) firms.add(r.law_firm); });
+    return Array.from(firms).sort();
+  }, [reports]);
 
   const filtered = reports
     .filter(r => filter === "all" || r.classification === filter)
     .filter(r => levelFilter === "all" || r.wage_level === levelFilter)
-    .filter(r => eduFilter === "all" || r.education_level === eduFilter);
+    .filter(r => eduFilter === "all" || r.education_level === eduFilter)
+    .filter(r => firmFilter === "all" || r.law_firm === firmFilter);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
