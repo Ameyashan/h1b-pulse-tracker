@@ -18,6 +18,7 @@ interface PetitionEntry {
   wage_level: string;
   education: string;
   job_category: string | null;
+  law_firm: string | null;
   filing_date: string | null;
   email: string | null;
   created_at: string;
@@ -482,7 +483,7 @@ export function PetitionTrackerTab() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border/40">
-                  {["STATUS", "DAYS", "TYPE", "CENTER", "WAGE", "WHEN"].map((h) => (
+                  {["STATUS", "DAYS", "TYPE", "CENTER", "WAGE", "LAW FIRM", "WHEN"].map((h) => (
                     <th key={h} className="text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground px-4 py-3 text-left font-medium">{h}</th>
                   ))}
                 </tr>
@@ -509,6 +510,7 @@ export function PetitionTrackerTab() {
                         <td className="px-4 py-3 text-muted-foreground capitalize">{e.service_center}</td>
                         
                         <td className="px-4 py-3 text-muted-foreground">{WAGE_OPTIONS.find((w) => w.value === e.wage_level)?.label || e.wage_level}</td>
+                        <td className="px-4 py-3 text-muted-foreground">{e.law_firm || "—"}</td>
                         <td className="px-4 py-3 text-muted-foreground">{relativeTime(e.created_at)}</td>
                       </tr>
                     );
