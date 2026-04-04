@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { LawFirmCombobox } from "@/components/LawFirmCombobox";
 
 /* ── types ── */
 interface PetitionEntry {
@@ -122,7 +123,7 @@ export function PetitionTrackerTab() {
   const [center, setCenter] = useState("");
   const [wage, setWage] = useState("");
   const [education, setEducation] = useState("");
-  
+  const [lawFirm, setLawFirm] = useState("");
   const [filingDate, setFilingDate] = useState<Date | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
 
@@ -141,7 +142,7 @@ export function PetitionTrackerTab() {
   const [editCenter, setEditCenter] = useState("");
   const [editWage, setEditWage] = useState("");
   const [editEducation, setEditEducation] = useState("");
-  
+  const [editLawFirm, setEditLawFirm] = useState("");
   const [editFiling, setEditFiling] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -180,12 +181,12 @@ export function PetitionTrackerTab() {
         service_center: center,
         wage_level: wage,
         education,
-        
+        law_firm: lawFirm || null,
         filing_date: filingDate ? format(filingDate, "MMM d") : null,
       });
       if (error) throw error;
       setSuccessCode(code);
-      setStatus(""); setProcessing(""); setCenter(""); setWage(""); setEducation(""); setFilingDate(undefined);
+      setStatus(""); setProcessing(""); setCenter(""); setWage(""); setEducation(""); setLawFirm(""); setFilingDate(undefined);
       toast.success("Petition logged!");
     } catch (err) {
       console.error(err);
@@ -223,6 +224,7 @@ export function PetitionTrackerTab() {
       setEditCenter(entry.service_center);
       setEditWage(entry.wage_level);
       setEditEducation(entry.education);
+      setEditLawFirm((entry as any).law_firm || "");
       
       setEditFiling(entry.filing_date || "");
     } catch { toast.error("Lookup failed"); } finally { setLookingUp(false); }
@@ -235,7 +237,7 @@ export function PetitionTrackerTab() {
       const { error } = await supabase.from("petition_entries").update({
         status: editStatus, processing_type: editProcessing, service_center: editCenter,
         wage_level: editWage, education: editEducation,
-        job_category: null, filing_date: editFiling || null, updated_at: new Date().toISOString(),
+        job_category: null, law_firm: editLawFirm || null, filing_date: editFiling || null, updated_at: new Date().toISOString(),
       }).eq("update_code", lookupEntry.update_code);
       if (error) throw error;
       toast.success("Petition updated!");
@@ -318,6 +320,10 @@ export function PetitionTrackerTab() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
             <DarkSelect label="Education" value={education} onChange={setEducation} options={EDUCATION_OPTIONS} />
             <div className="space-y-1.5">
+              <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Law Firm</label>
+              <LawFirmCombobox value={lawFirm} onChange={setLawFirm} />
+            </div>
+            <div className="space-y-1.5">
               <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Filing Date</label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -366,6 +372,10 @@ export function PetitionTrackerTab() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
             <DarkSelect label="Education" value={editEducation} onChange={setEditEducation} options={EDUCATION_OPTIONS} />
+            <div className="space-y-1.5">
+              <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Law Firm</label>
+              <LawFirmCombobox value={editLawFirm} onChange={setEditLawFirm} />
+            </div>
             <div className="space-y-1.5">
               <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Filing Date</label>
               <Popover>

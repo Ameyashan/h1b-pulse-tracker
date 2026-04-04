@@ -1,0 +1,1 @@
+ALTER TABLE public.petition_entries ADD COLUMN law_firm text;
