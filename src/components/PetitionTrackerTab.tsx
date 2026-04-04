@@ -223,7 +223,7 @@ export function PetitionTrackerTab() {
       setEditCenter(entry.service_center);
       setEditWage(entry.wage_level);
       setEditEducation(entry.education);
-      setEditJob(entry.job_category || "");
+      
       setEditFiling(entry.filing_date || "");
     } catch { toast.error("Lookup failed"); } finally { setLookingUp(false); }
   };
