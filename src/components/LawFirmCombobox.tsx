@@ -85,11 +85,8 @@ export function LawFirmCombobox({ value, onChange }: LawFirmComboboxProps) {
 
   return (
     <div className="space-y-1.5">
-      <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+      <label className="text-xs text-muted-foreground">
         Law Firm
-        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-purple-500/20 text-purple-400 animate-pulse">
-          NEW
-        </span>
       </label>
       <div ref={containerRef} className="relative">
         {isOther ? (

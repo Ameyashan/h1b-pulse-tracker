@@ -319,10 +319,7 @@ export function PetitionTrackerTab() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
             <DarkSelect label="Education" value={education} onChange={setEducation} options={EDUCATION_OPTIONS} />
-            <div className="space-y-1.5">
-              <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Law Firm</label>
-              <LawFirmCombobox value={lawFirm} onChange={setLawFirm} />
-            </div>
+            <LawFirmCombobox value={lawFirm} onChange={setLawFirm} />
             <div className="space-y-1.5">
               <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Filing Date</label>
               <Popover>
@@ -340,7 +337,7 @@ export function PetitionTrackerTab() {
                 </PopoverContent>
               </Popover>
             </div>
-            <button onClick={handleSubmit} disabled={submitting}
+            <button onClick={handleSubmit} disabled={submitting || !status || !processing || !center || !wage || !education || !filingDate}
               className="h-11 rounded-[10px] bg-emerald-500 hover:bg-emerald-500/90 text-background font-bold text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
               {submitting ? "..." : <>✓ Submit</>}
             </button>
@@ -372,10 +369,7 @@ export function PetitionTrackerTab() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
             <DarkSelect label="Education" value={editEducation} onChange={setEditEducation} options={EDUCATION_OPTIONS} />
-            <div className="space-y-1.5">
-              <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Law Firm</label>
-              <LawFirmCombobox value={editLawFirm} onChange={setEditLawFirm} />
-            </div>
+            <LawFirmCombobox value={editLawFirm} onChange={setEditLawFirm} />
             <div className="space-y-1.5">
               <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Filing Date</label>
               <Popover>
