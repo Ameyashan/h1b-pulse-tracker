@@ -35,6 +35,11 @@ function ReportRow({ report }: { report: Report }) {
               {report.education_level === "Masters" ? "Master's" : report.education_level === "Bachelors" ? "Bachelor's" : report.education_level}
             </span>
           )}
+          {report.law_firm && (
+            <span className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded-md truncate max-w-[150px]">
+              {report.law_firm}
+            </span>
+          )}
         </div>
       </div>
       <span className="text-xs text-muted-foreground shrink-0">{timeAgo}</span>
