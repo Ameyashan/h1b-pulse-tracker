@@ -28,11 +28,11 @@ const STATUS_OPTIONS = [
   { value: "not_yet_filed", label: "Not Yet Filed" },
   { value: "filed_awaiting_receipt", label: "Filed - Awaiting Receipt" },
   { value: "case_received", label: "Case Received" },
-  { value: "actively_reviewed", label: "Actively Reviewed" },
-  { value: "rfe_received", label: "RFE Received" },
-  { value: "rfe_responded", label: "RFE Responded" },
-  { value: "approved", label: "Approved" },
-  { value: "denied", label: "Denied" },
+  { value: "actively_reviewed", label: "Actively Reviewed", disabled: true },
+  { value: "rfe_received", label: "RFE Received", disabled: true },
+  { value: "rfe_responded", label: "RFE Responded", disabled: true },
+  { value: "approved", label: "Approved", disabled: true },
+  { value: "denied", label: "Denied", disabled: true },
 ];
 
 const PROCESSING_OPTIONS = [
