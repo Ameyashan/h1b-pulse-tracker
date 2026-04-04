@@ -146,7 +146,7 @@ export function PetitionTrackerTab() {
   const [editCenter, setEditCenter] = useState("");
   const [editWage, setEditWage] = useState("");
   const [editEducation, setEditEducation] = useState("");
-  
+  const [editLawFirm, setEditLawFirm] = useState("");
   const [editFiling, setEditFiling] = useState("");
   const [saving, setSaving] = useState(false);
 
