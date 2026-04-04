@@ -94,7 +94,7 @@ function relativeTime(dateStr: string) {
 /* ── Styled Select ── */
 function DarkSelect({ label, value, onChange, options, placeholder = "Select" }: {
   label: string; value: string; onChange: (v: string) => void;
-  options: { value: string; label: string }[]; placeholder?: string;
+  options: { value: string; label: string; disabled?: boolean }[]; placeholder?: string;
 }) {
   return (
     <div className="space-y-1.5">
@@ -106,7 +106,7 @@ function DarkSelect({ label, value, onChange, options, placeholder = "Select" }:
       >
         <option value="">{placeholder}</option>
         {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
+          <option key={o.value} value={o.value} disabled={o.disabled}>{o.label}{o.disabled ? " (coming soon)" : ""}</option>
         ))}
       </select>
     </div>
