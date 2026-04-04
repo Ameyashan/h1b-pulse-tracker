@@ -9,6 +9,7 @@ import { ResponsesChart } from "@/components/ResponsesChart";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { StickyBottomBar } from "@/components/StickyBottomBar";
 import { PetitionTrackerTab } from "@/components/PetitionTrackerTab";
+import { PetitionCTABanner } from "@/components/PetitionCTABanner";
 import { NextStepsTab } from "@/components/NextStepsTab";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
@@ -98,6 +99,7 @@ export default function Index() {
           </TabsList>
 
           <TabsContent value="lottery" className="space-y-4">
+            <PetitionCTABanner onNavigate={() => handleTabChange("petition")} />
             <ReportForm onSubmitted={fetchReports} />
             <DisclaimerBanner />
             <StatsCards selected={counts.selected} notSelected={counts.not_selected} total={total} />
