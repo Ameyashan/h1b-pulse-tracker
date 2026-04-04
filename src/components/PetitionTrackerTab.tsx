@@ -122,7 +122,7 @@ export function PetitionTrackerTab() {
   const [center, setCenter] = useState("");
   const [wage, setWage] = useState("");
   const [education, setEducation] = useState("");
-  const [jobCategory, setJobCategory] = useState("");
+  
   const [filingDate, setFilingDate] = useState<Date | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
 
@@ -141,7 +141,7 @@ export function PetitionTrackerTab() {
   const [editCenter, setEditCenter] = useState("");
   const [editWage, setEditWage] = useState("");
   const [editEducation, setEditEducation] = useState("");
-  const [editJob, setEditJob] = useState("");
+  
   const [editFiling, setEditFiling] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -180,12 +180,12 @@ export function PetitionTrackerTab() {
         service_center: center,
         wage_level: wage,
         education,
-        job_category: jobCategory || null,
+        
         filing_date: filingDate ? format(filingDate, "MMM d") : null,
       });
       if (error) throw error;
       setSuccessCode(code);
-      setStatus(""); setProcessing(""); setCenter(""); setWage(""); setEducation(""); setJobCategory(""); setFilingDate(undefined);
+      setStatus(""); setProcessing(""); setCenter(""); setWage(""); setEducation(""); setFilingDate(undefined);
       toast.success("Petition logged!");
     } catch (err) {
       console.error(err);
@@ -223,7 +223,7 @@ export function PetitionTrackerTab() {
       setEditCenter(entry.service_center);
       setEditWage(entry.wage_level);
       setEditEducation(entry.education);
-      setEditJob(entry.job_category || "");
+      
       setEditFiling(entry.filing_date || "");
     } catch { toast.error("Lookup failed"); } finally { setLookingUp(false); }
   };
@@ -235,7 +235,7 @@ export function PetitionTrackerTab() {
       const { error } = await supabase.from("petition_entries").update({
         status: editStatus, processing_type: editProcessing, service_center: editCenter,
         wage_level: editWage, education: editEducation,
-        job_category: editJob || null, filing_date: editFiling || null, updated_at: new Date().toISOString(),
+        job_category: null, filing_date: editFiling || null, updated_at: new Date().toISOString(),
       }).eq("update_code", lookupEntry.update_code);
       if (error) throw error;
       toast.success("Petition updated!");
@@ -318,12 +318,6 @@ export function PetitionTrackerTab() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
             <DarkSelect label="Education" value={education} onChange={setEducation} options={EDUCATION_OPTIONS} />
             <div className="space-y-1.5">
-              <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Job Category</label>
-              <input type="text" placeholder="e.g., Software Engineer" value={jobCategory}
-                onChange={(e) => setJobCategory(e.target.value)}
-                className="w-full h-11 rounded-[10px] bg-[#1a2030] border border-[#2a3347] px-3 text-sm text-foreground font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50" />
-            </div>
-            <div className="space-y-1.5">
               <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Filing Date</label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -372,11 +366,6 @@ export function PetitionTrackerTab() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
             <DarkSelect label="Education" value={editEducation} onChange={setEditEducation} options={EDUCATION_OPTIONS} />
-            <div className="space-y-1.5">
-              <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Job Category</label>
-              <input type="text" value={editJob} onChange={(e) => setEditJob(e.target.value)}
-                className="w-full h-11 rounded-[10px] bg-[#1a2030] border border-[#2a3347] px-3 text-sm text-foreground font-mono focus:outline-none focus:ring-2 focus:ring-primary/50" />
-            </div>
             <div className="space-y-1.5">
               <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Filing Date</label>
               <Popover>
@@ -489,7 +478,7 @@ export function PetitionTrackerTab() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border/40">
-                  {["STATUS", "DAYS", "TYPE", "CENTER", "CATEGORY", "WAGE", "WHEN"].map((h) => (
+                  {["STATUS", "DAYS", "TYPE", "CENTER", "WAGE", "WHEN"].map((h) => (
                     <th key={h} className="text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground px-4 py-3 text-left font-medium">{h}</th>
                   ))}
                 </tr>
@@ -514,7 +503,7 @@ export function PetitionTrackerTab() {
                         <td className="px-4 py-3 font-mono text-foreground">{daysSince(e.created_at)}</td>
                         <td className="px-4 py-3 text-muted-foreground capitalize">{e.processing_type}</td>
                         <td className="px-4 py-3 text-muted-foreground capitalize">{e.service_center}</td>
-                        <td className="px-4 py-3 text-muted-foreground">{e.job_category || "—"}</td>
+                        
                         <td className="px-4 py-3 text-muted-foreground">{WAGE_OPTIONS.find((w) => w.value === e.wage_level)?.label || e.wage_level}</td>
                         <td className="px-4 py-3 text-muted-foreground">{relativeTime(e.created_at)}</td>
                       </tr>
