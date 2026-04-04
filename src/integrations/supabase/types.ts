@@ -122,6 +122,30 @@ export type Database = {
         }
         Relationships: []
       }
+      feedback: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          page: string | null
+          rating: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          page?: string | null
+          rating: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          page?: string | null
+          rating?: number
+        }
+        Relationships: []
+      }
       not_selected_emails: {
         Row: {
           created_at: string
