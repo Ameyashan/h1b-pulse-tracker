@@ -330,7 +330,7 @@ export function PetitionTrackerTab() {
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={filingDate} onSelect={setFilingDate} initialFocus className="p-3 pointer-events-auto" />
+                  <Calendar mode="single" selected={filingDate} onSelect={setFilingDate} disabled={(date) => date > new Date()} initialFocus className="p-3 pointer-events-auto" />
                 </PopoverContent>
               </Popover>
             </div>
@@ -379,7 +379,7 @@ export function PetitionTrackerTab() {
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={editFiling ? parse(editFiling, "MMM d", new Date()) : undefined} onSelect={(d) => setEditFiling(d ? format(d, "MMM d") : "")} initialFocus className="p-3 pointer-events-auto" />
+                  <Calendar mode="single" selected={editFiling ? parse(editFiling, "MMM d", new Date()) : undefined} onSelect={(d) => setEditFiling(d ? format(d, "MMM d") : "")} disabled={(date) => date > new Date()} initialFocus className="p-3 pointer-events-auto" />
                 </PopoverContent>
               </Popover>
             </div>
