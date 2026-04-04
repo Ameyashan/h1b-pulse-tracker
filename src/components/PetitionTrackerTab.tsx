@@ -1,7 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
-import { CheckCircle2, ArrowLeft, AlertTriangle, RefreshCw, ExternalLink } from "lucide-react";
+import { CheckCircle2, ArrowLeft, AlertTriangle, RefreshCw, ExternalLink, CalendarIcon } from "lucide-react";
+import { format, parse } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 /* ── types ── */
 interface PetitionEntry {
@@ -119,7 +123,7 @@ export function PetitionTrackerTab() {
   const [wage, setWage] = useState("");
   const [education, setEducation] = useState("");
   const [jobCategory, setJobCategory] = useState("");
-  const [filingDate, setFilingDate] = useState("");
+  const [filingDate, setFilingDate] = useState<Date | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
 
   // Success state
@@ -177,11 +181,11 @@ export function PetitionTrackerTab() {
         wage_level: wage,
         education,
         job_category: jobCategory || null,
-        filing_date: filingDate || null,
+        filing_date: filingDate ? format(filingDate, "MMM d") : null,
       });
       if (error) throw error;
       setSuccessCode(code);
-      setStatus(""); setProcessing(""); setCenter(""); setWage(""); setEducation(""); setJobCategory(""); setFilingDate("");
+      setStatus(""); setProcessing(""); setCenter(""); setWage(""); setEducation(""); setJobCategory(""); setFilingDate(undefined);
       toast.success("Petition logged!");
     } catch (err) {
       console.error(err);
@@ -321,9 +325,20 @@ export function PetitionTrackerTab() {
             </div>
             <div className="space-y-1.5">
               <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Filing Date</label>
-              <input type="text" placeholder="e.g., Apr 3" value={filingDate}
-                onChange={(e) => setFilingDate(e.target.value)}
-                className="w-full h-11 rounded-[10px] bg-[#1a2030] border border-[#2a3347] px-3 text-sm text-foreground font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50" />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className={cn(
+                    "w-full h-11 rounded-[10px] bg-[#1a2030] border border-[#2a3347] px-3 text-sm font-mono flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-primary/50",
+                    filingDate ? "text-foreground" : "text-muted-foreground"
+                  )}>
+                    {filingDate ? format(filingDate, "MMM d, yyyy") : "Pick a date"}
+                    <CalendarIcon className="h-4 w-4 opacity-50" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={filingDate} onSelect={setFilingDate} initialFocus className="p-3 pointer-events-auto" />
+                </PopoverContent>
+              </Popover>
             </div>
             <button onClick={handleSubmit} disabled={submitting}
               className="h-11 rounded-[10px] bg-emerald-500 hover:bg-emerald-500/90 text-background font-bold text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
@@ -364,8 +379,20 @@ export function PetitionTrackerTab() {
             </div>
             <div className="space-y-1.5">
               <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Filing Date</label>
-              <input type="text" value={editFiling} onChange={(e) => setEditFiling(e.target.value)}
-                className="w-full h-11 rounded-[10px] bg-[#1a2030] border border-[#2a3347] px-3 text-sm text-foreground font-mono focus:outline-none focus:ring-2 focus:ring-primary/50" />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className={cn(
+                    "w-full h-11 rounded-[10px] bg-[#1a2030] border border-[#2a3347] px-3 text-sm font-mono flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-primary/50",
+                    editFiling ? "text-foreground" : "text-muted-foreground"
+                  )}>
+                    {editFiling || "Pick a date"}
+                    <CalendarIcon className="h-4 w-4 opacity-50" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={editFiling ? parse(editFiling, "MMM d", new Date()) : undefined} onSelect={(d) => setEditFiling(d ? format(d, "MMM d") : "")} initialFocus className="p-3 pointer-events-auto" />
+                </PopoverContent>
+              </Popover>
             </div>
             <button onClick={handleSaveUpdate} disabled={saving}
               className="h-11 rounded-[10px] bg-emerald-500 hover:bg-emerald-500/90 text-background font-bold text-sm transition-colors disabled:opacity-50">
