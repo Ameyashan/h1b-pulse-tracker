@@ -122,7 +122,7 @@ export function PetitionTrackerTab() {
   const [center, setCenter] = useState("");
   const [wage, setWage] = useState("");
   const [education, setEducation] = useState("");
-  const [jobCategory, setJobCategory] = useState("");
+  
   const [filingDate, setFilingDate] = useState<Date | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
 
