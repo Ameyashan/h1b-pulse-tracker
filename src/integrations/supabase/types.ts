@@ -158,6 +158,51 @@ export type Database = {
         }
         Relationships: []
       }
+      petition_entries: {
+        Row: {
+          created_at: string
+          education: string
+          email: string | null
+          filing_date: string | null
+          id: string
+          job_category: string | null
+          processing_type: string
+          service_center: string
+          status: string
+          update_code: string
+          updated_at: string
+          wage_level: string
+        }
+        Insert: {
+          created_at?: string
+          education: string
+          email?: string | null
+          filing_date?: string | null
+          id?: string
+          job_category?: string | null
+          processing_type?: string
+          service_center: string
+          status?: string
+          update_code: string
+          updated_at?: string
+          wage_level: string
+        }
+        Update: {
+          created_at?: string
+          education?: string
+          email?: string | null
+          filing_date?: string | null
+          id?: string
+          job_category?: string | null
+          processing_type?: string
+          service_center?: string
+          status?: string
+          update_code?: string
+          updated_at?: string
+          wage_level?: string
+        }
+        Relationships: []
+      }
       signals: {
         Row: {
           author: string
