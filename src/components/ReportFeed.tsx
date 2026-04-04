@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Filter } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -55,12 +55,20 @@ export function ReportFeed({ reports }: ReportFeedProps) {
   const [filter, setFilter] = useState<"all" | ReportStatus>("all");
   const [levelFilter, setLevelFilter] = useState<string>("all");
   const [eduFilter, setEduFilter] = useState<string>("all");
+  const [firmFilter, setFirmFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
+
+  const lawFirms = useMemo(() => {
+    const firms = new Set<string>();
+    reports.forEach(r => { if (r.law_firm) firms.add(r.law_firm); });
+    return Array.from(firms).sort();
+  }, [reports]);
 
   const filtered = reports
     .filter(r => filter === "all" || r.classification === filter)
     .filter(r => levelFilter === "all" || r.wage_level === levelFilter)
-    .filter(r => eduFilter === "all" || r.education_level === eduFilter);
+    .filter(r => eduFilter === "all" || r.education_level === eduFilter)
+    .filter(r => firmFilter === "all" || r.law_firm === firmFilter);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -103,6 +111,17 @@ export function ReportFeed({ reports }: ReportFeedProps) {
               <SelectItem value="2">Level 2</SelectItem>
               <SelectItem value="3">Level 3</SelectItem>
               <SelectItem value="4">Level 4</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={firmFilter} onValueChange={handleFilterChange(setFirmFilter)}>
+            <SelectTrigger className="w-[140px] h-8 text-xs bg-card border-border">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Firms</SelectItem>
+              {lawFirms.map(f => (
+                <SelectItem key={f} value={f}>{f}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select value={eduFilter} onValueChange={handleFilterChange(setEduFilter)}>
