@@ -113,6 +113,17 @@ export function ReportFeed({ reports }: ReportFeedProps) {
               <SelectItem value="4">Level 4</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={firmFilter} onValueChange={handleFilterChange(setFirmFilter)}>
+            <SelectTrigger className="w-[140px] h-8 text-xs bg-card border-border">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Firms</SelectItem>
+              {lawFirms.map(f => (
+                <SelectItem key={f} value={f}>{f}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={eduFilter} onValueChange={handleFilterChange(setEduFilter)}>
             <SelectTrigger className="w-[120px] h-8 text-xs bg-card border-border">
               <SelectValue />
