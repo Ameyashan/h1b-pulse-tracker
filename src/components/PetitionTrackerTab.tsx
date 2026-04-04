@@ -337,7 +337,7 @@ export function PetitionTrackerTab() {
                 </PopoverContent>
               </Popover>
             </div>
-            <button onClick={handleSubmit} disabled={submitting}
+            <button onClick={handleSubmit} disabled={submitting || !status || !processing || !center || !wage || !education || !filingDate}
               className="h-11 rounded-[10px] bg-emerald-500 hover:bg-emerald-500/90 text-background font-bold text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
               {submitting ? "..." : <>✓ Submit</>}
             </button>
