@@ -99,6 +99,7 @@ export default function Index() {
           </TabsList>
 
           <TabsContent value="lottery" className="space-y-4">
+            <PetitionCTABanner onNavigate={() => handleTabChange("petition")} />
             <ReportForm onSubmitted={fetchReports} />
             <DisclaimerBanner />
             <StatsCards selected={counts.selected} notSelected={counts.not_selected} total={total} />
