@@ -141,7 +141,7 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
   };
 
   return (
-    <div className="stat-card border-2 border-transparent relative" style={{ borderImage: 'linear-gradient(135deg, hsl(45 93% 47%), hsl(36 100% 50%), hsl(45 93% 47%)) 1' }}>
+    <div className="stat-card border border-border/60">
       {showCongrats && (
         <div className="absolute inset-0 z-10 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-300" style={{ minHeight: 'fit-content' }}>
           <button
