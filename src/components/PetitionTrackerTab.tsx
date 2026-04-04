@@ -1,7 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
-import { CheckCircle2, ArrowLeft, AlertTriangle, RefreshCw, ExternalLink } from "lucide-react";
+import { CheckCircle2, ArrowLeft, AlertTriangle, RefreshCw, ExternalLink, CalendarIcon } from "lucide-react";
+import { format, parse } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 /* ── types ── */
 interface PetitionEntry {
