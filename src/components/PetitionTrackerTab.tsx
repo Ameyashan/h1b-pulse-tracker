@@ -7,10 +7,6 @@ import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { LawFirmCombobox } from "@/components/LawFirmCombobox";
-import { supabase } from "@/integrations/supabase/client";
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 /* ── types ── */
 interface PetitionEntry {
