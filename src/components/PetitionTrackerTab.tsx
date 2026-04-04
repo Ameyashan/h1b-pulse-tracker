@@ -318,12 +318,6 @@ export function PetitionTrackerTab() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
             <DarkSelect label="Education" value={education} onChange={setEducation} options={EDUCATION_OPTIONS} />
             <div className="space-y-1.5">
-              <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Job Category</label>
-              <input type="text" placeholder="e.g., Software Engineer" value={jobCategory}
-                onChange={(e) => setJobCategory(e.target.value)}
-                className="w-full h-11 rounded-[10px] bg-[#1a2030] border border-[#2a3347] px-3 text-sm text-foreground font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50" />
-            </div>
-            <div className="space-y-1.5">
               <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Filing Date</label>
               <Popover>
                 <PopoverTrigger asChild>
