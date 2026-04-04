@@ -185,7 +185,7 @@ export function PetitionTrackerTab() {
       });
       if (error) throw error;
       setSuccessCode(code);
-      setStatus(""); setProcessing(""); setCenter(""); setWage(""); setEducation(""); setJobCategory(""); setFilingDate("");
+      setStatus(""); setProcessing(""); setCenter(""); setWage(""); setEducation(""); setJobCategory(""); setFilingDate(undefined);
       toast.success("Petition logged!");
     } catch (err) {
       console.error(err);
