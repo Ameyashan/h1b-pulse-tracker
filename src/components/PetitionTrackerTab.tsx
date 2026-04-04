@@ -324,6 +324,10 @@ export function PetitionTrackerTab() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
             <DarkSelect label="Education" value={education} onChange={setEducation} options={EDUCATION_OPTIONS} />
             <div className="space-y-1.5">
+              <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Law Firm</label>
+              <LawFirmCombobox value={lawFirm} onChange={setLawFirm} />
+            </div>
+            <div className="space-y-1.5">
               <label className="block text-[10px] uppercase tracking-[1px] font-mono text-muted-foreground">Filing Date</label>
               <Popover>
                 <PopoverTrigger asChild>
