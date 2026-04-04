@@ -330,7 +330,7 @@ export function PetitionTrackerTab() {
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={filingDate} onSelect={setFilingDate} initialFocus className="p-3 pointer-events-auto" />
+                  <Calendar mode="single" selected={filingDate} onSelect={setFilingDate} disabled={(date) => date > new Date()} initialFocus className="p-3 pointer-events-auto" />
                 </PopoverContent>
               </Popover>
             </div>
