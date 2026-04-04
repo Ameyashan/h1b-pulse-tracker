@@ -181,7 +181,7 @@ export function PetitionTrackerTab() {
         wage_level: wage,
         education,
         job_category: jobCategory || null,
-        filing_date: filingDate || null,
+        filing_date: filingDate ? format(filingDate, "MMM d") : null,
       });
       if (error) throw error;
       setSuccessCode(code);
