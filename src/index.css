@@ -78,3 +78,18 @@
     @apply bg-card border border-border rounded-lg p-5 transition-colors hover:border-primary/30;
   }
 }
+
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: hsl(160 60% 45% / 0.6);
+    box-shadow: 0 0 12px hsl(160 60% 45% / 0.15);
+  }
+  50% {
+    border-color: hsl(160 60% 45% / 0.2);
+    box-shadow: 0 0 4px hsl(160 60% 45% / 0.05);
+  }
+}
+
+.animate-pulse-border {
+  animation: pulse-border 2s ease-in-out infinite;
+}
