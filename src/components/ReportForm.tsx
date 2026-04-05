@@ -42,10 +42,14 @@ export function ReportForm({ onSubmitted }: ReportFormProps) {
         .insert({ email: congratsEmail.trim() });
       if (dbError) console.error("Failed to save email:", dbError);
 
-      // Send congratulations email via Resend
-      const { data, error } = await supabase.functions.invoke("send-selected-email", {
-        body: { email: congratsEmail.trim() },
-      });
+      // Send congratulations email via transactional system
+      const { error } = await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "h1b-selected-congrats",
+          recipientEmail: congratsEmail.trim(),
+          idempotencyKey: `h1b-congrats-lottery-${congratsEmail.trim().toLowerCase()}`,
+        },
+      })
       if (error) throw error;
 
       toast.success("Congrats email sent! Check your inbox 🎉");

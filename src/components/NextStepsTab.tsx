@@ -233,6 +233,16 @@ export function NextStepsTab() {
     try {
       const { error } = await supabase.from("notification_emails").insert({ email: email.trim() });
       if (error) throw error;
+
+      // Send congrats email
+      await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "h1b-selected-congrats",
+          recipientEmail: email.trim(),
+          idempotencyKey: `h1b-congrats-nextsteps-${email.trim().toLowerCase()}`,
+        },
+      });
+
       setSubmitted(true);
       toast.success("You're on the list!");
     } catch {
