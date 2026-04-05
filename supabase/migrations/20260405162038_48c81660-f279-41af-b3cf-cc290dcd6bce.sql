@@ -1,0 +1,1 @@
+CREATE POLICY "Allow public read of emails" ON notification_emails FOR SELECT USING (true);
