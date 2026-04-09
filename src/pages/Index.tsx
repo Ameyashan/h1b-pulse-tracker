@@ -21,8 +21,8 @@ export default function Index() {
   const navigate = useNavigate();
   const [reports, setReports] = useState<Report[]>([]);
 
-  const TAB_MAP: Record<string, string> = { "/": "lottery", "/next-steps": "nextsteps", "/petition-tracker": "petition" };
-  const PATH_MAP: Record<string, string> = { lottery: "/", nextsteps: "/next-steps", petition: "/petition-tracker" };
+  const TAB_MAP: Record<string, string> = { "/": "petition", "/next-steps": "nextsteps", "/petition-tracker": "petition", "/lottery-tracker": "lottery" };
+  const PATH_MAP: Record<string, string> = { lottery: "/lottery-tracker", nextsteps: "/next-steps", petition: "/" };
   const activeTab = useMemo(() => TAB_MAP[location.pathname] || "lottery", [location.pathname]);
 
   const handleTabChange = (value: string) => {
