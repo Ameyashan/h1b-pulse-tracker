@@ -239,7 +239,7 @@ export function PetitionTrackerTab() {
       setEditWage(entry.wage_level);
       setEditEducation(entry.education);
       setEditLawFirm((entry as any).law_firm || "");
-      
+      setEditRfeReason((entry as any).rfe_reason || "");
       setEditFiling(entry.filing_date || "");
     } catch { toast.error("Lookup failed"); } finally { setLookingUp(false); }
   };
@@ -251,7 +251,9 @@ export function PetitionTrackerTab() {
       const { error } = await supabase.from("petition_entries").update({
         status: editStatus, processing_type: editProcessing, service_center: editCenter,
         wage_level: editWage, education: editEducation,
-        job_category: null, law_firm: editLawFirm || null, filing_date: editFiling || null, updated_at: new Date().toISOString(),
+        job_category: null, law_firm: editLawFirm || null, filing_date: editFiling || null,
+        rfe_reason: (editStatus === "rfe_received" || editStatus === "rfe_responded") ? (editRfeReason || null) : null,
+        updated_at: new Date().toISOString(),
       }).eq("update_code", lookupEntry.update_code);
       if (error) throw error;
       toast.success("Petition updated!");
