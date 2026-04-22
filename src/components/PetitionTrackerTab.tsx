@@ -196,10 +196,11 @@ export function PetitionTrackerTab() {
         education,
         law_firm: lawFirm || null,
         filing_date: filingDate ? format(filingDate, "MMM d") : null,
+        rfe_reason: (status === "rfe_received" || status === "rfe_responded") ? (rfeReason || null) : null,
       });
       if (error) throw error;
       setSuccessCode(code);
-      setStatus(""); setProcessing(""); setCenter(""); setWage(""); setEducation(""); setLawFirm(""); setFilingDate(undefined);
+      setStatus(""); setProcessing(""); setCenter(""); setWage(""); setEducation(""); setLawFirm(""); setFilingDate(undefined); setRfeReason("");
       toast.success("Petition logged!");
     } catch (err) {
       console.error(err);
