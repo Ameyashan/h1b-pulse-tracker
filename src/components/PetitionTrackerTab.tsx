@@ -21,9 +21,19 @@ interface PetitionEntry {
   law_firm: string | null;
   filing_date: string | null;
   email: string | null;
+  rfe_reason: string | null;
   created_at: string;
   updated_at: string;
 }
+
+const RFE_REASON_OPTIONS = [
+  { value: "specialty_occupation", label: "Specialty Occupation" },
+  { value: "wage_level", label: "Wage Level" },
+  { value: "employer_employee", label: "Employer-Employee Rel." },
+  { value: "qualifications", label: "Beneficiary Qualifications" },
+  { value: "maintenance_of_status", label: "Maintenance of Status" },
+  { value: "other", label: "Other" },
+];
 
 const STATUS_OPTIONS = [
   { value: "not_yet_filed", label: "Not Yet Filed" },
