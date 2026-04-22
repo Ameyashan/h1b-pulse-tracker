@@ -21,9 +21,19 @@ interface PetitionEntry {
   law_firm: string | null;
   filing_date: string | null;
   email: string | null;
+  rfe_reason: string | null;
   created_at: string;
   updated_at: string;
 }
+
+const RFE_REASON_OPTIONS = [
+  { value: "specialty_occupation", label: "Specialty Occupation" },
+  { value: "wage_level", label: "Wage Level" },
+  { value: "employer_employee", label: "Employer-Employee Rel." },
+  { value: "qualifications", label: "Beneficiary Qualifications" },
+  { value: "maintenance_of_status", label: "Maintenance of Status" },
+  { value: "other", label: "Other" },
+];
 
 const STATUS_OPTIONS = [
   { value: "not_yet_filed", label: "Not Yet Filed" },
@@ -126,6 +136,7 @@ export function PetitionTrackerTab() {
   const [education, setEducation] = useState("");
   const [lawFirm, setLawFirm] = useState("");
   const [filingDate, setFilingDate] = useState<Date | undefined>(undefined);
+  const [rfeReason, setRfeReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   // Success state
@@ -145,6 +156,7 @@ export function PetitionTrackerTab() {
   const [editEducation, setEditEducation] = useState("");
   const [editLawFirm, setEditLawFirm] = useState("");
   const [editFiling, setEditFiling] = useState("");
+  const [editRfeReason, setEditRfeReason] = useState("");
   const [saving, setSaving] = useState(false);
 
   // Email CTA
@@ -184,10 +196,11 @@ export function PetitionTrackerTab() {
         education,
         law_firm: lawFirm || null,
         filing_date: filingDate ? format(filingDate, "MMM d") : null,
+        rfe_reason: (status === "rfe_received" || status === "rfe_responded") ? (rfeReason || null) : null,
       });
       if (error) throw error;
       setSuccessCode(code);
-      setStatus(""); setProcessing(""); setCenter(""); setWage(""); setEducation(""); setLawFirm(""); setFilingDate(undefined);
+      setStatus(""); setProcessing(""); setCenter(""); setWage(""); setEducation(""); setLawFirm(""); setFilingDate(undefined); setRfeReason("");
       toast.success("Petition logged!");
     } catch (err) {
       console.error(err);
@@ -226,7 +239,7 @@ export function PetitionTrackerTab() {
       setEditWage(entry.wage_level);
       setEditEducation(entry.education);
       setEditLawFirm((entry as any).law_firm || "");
-      
+      setEditRfeReason((entry as any).rfe_reason || "");
       setEditFiling(entry.filing_date || "");
     } catch { toast.error("Lookup failed"); } finally { setLookingUp(false); }
   };
@@ -238,7 +251,9 @@ export function PetitionTrackerTab() {
       const { error } = await supabase.from("petition_entries").update({
         status: editStatus, processing_type: editProcessing, service_center: editCenter,
         wage_level: editWage, education: editEducation,
-        job_category: null, law_firm: editLawFirm || null, filing_date: editFiling || null, updated_at: new Date().toISOString(),
+        job_category: null, law_firm: editLawFirm || null, filing_date: editFiling || null,
+        rfe_reason: (editStatus === "rfe_received" || editStatus === "rfe_responded") ? (editRfeReason || null) : null,
+        updated_at: new Date().toISOString(),
       }).eq("update_code", lookupEntry.update_code);
       if (error) throw error;
       toast.success("Petition updated!");
@@ -343,6 +358,11 @@ export function PetitionTrackerTab() {
               {submitting ? "..." : <>✓ Submit</>}
             </button>
           </div>
+          {(status === "rfe_received" || status === "rfe_responded") && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <DarkSelect label="RFE Reason" value={rfeReason} onChange={setRfeReason} options={RFE_REASON_OPTIONS} placeholder="Select reason (optional)" />
+            </div>
+          )}
           {/* Disclaimer */}
           <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3 flex items-start gap-2.5 text-xs text-amber-200/80">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
@@ -393,6 +413,11 @@ export function PetitionTrackerTab() {
               {saving ? "..." : "Save Update"}
             </button>
           </div>
+          {(editStatus === "rfe_received" || editStatus === "rfe_responded") && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <DarkSelect label="RFE Reason" value={editRfeReason} onChange={setEditRfeReason} options={RFE_REASON_OPTIONS} placeholder="Select reason (optional)" />
+            </div>
+          )}
         </div>
       ) : (
         <div className="rounded-[14px] border border-border/60 bg-card p-3 sm:p-4 flex flex-col sm:flex-row items-center gap-3">
@@ -456,22 +481,30 @@ export function PetitionTrackerTab() {
         </GhostPanel>
 
         {/* Top RFE Reasons */}
-        <GhostPanel title="Top RFE Reasons" hasData={false}>
-          <div className="space-y-3 opacity-25">
-            <GhostBar label="Specialty Occupation" />
-            <GhostBar label="Wage Level" />
-            <GhostBar label="Employer Rel." />
-            <GhostBar label="Qualifications" />
-          </div>
+        <GhostPanel title="Top RFE Reasons" hasData={entries.some((e) => e.rfe_reason)}>
+          {entries.some((e) => e.rfe_reason) ? (
+            <RfeReasonsContent entries={entries} />
+          ) : (
+            <div className="space-y-3 opacity-25">
+              <GhostBar label="Specialty Occupation" />
+              <GhostBar label="Wage Level" />
+              <GhostBar label="Employer Rel." />
+              <GhostBar label="Qualifications" />
+            </div>
+          )}
         </GhostPanel>
 
         {/* Processing Timeline */}
-        <GhostPanel title="Processing Timeline" hasData={false}>
-          <div className="flex items-end gap-1.5 h-16 opacity-25">
-            {[30, 50, 20, 60, 40, 70, 35, 55].map((h, i) => (
-              <div key={i} className="flex-1 bg-muted/60 rounded-t" style={{ height: `${h}%` }} />
-            ))}
-          </div>
+        <GhostPanel title="Processing Timeline" hasData={entries.some((e) => e.filing_date)}>
+          {entries.some((e) => e.filing_date) ? (
+            <ProcessingTimelineContent entries={entries} />
+          ) : (
+            <div className="flex items-end gap-1.5 h-16 opacity-25">
+              {[30, 50, 20, 60, 40, 70, 35, 55].map((h, i) => (
+                <div key={i} className="flex-1 bg-muted/60 rounded-t" style={{ height: `${h}%` }} />
+              ))}
+            </div>
+          )}
         </GhostPanel>
       </div>
 
@@ -618,6 +651,96 @@ function ServiceCenterContent({ entries }: { entries: PetitionEntry[] }) {
           <div className="h-1.5 rounded-full bg-muted/30"><div className="h-full rounded-full bg-emerald-400" style={{ width: `${(c.count / max) * 100}%` }} /></div>
         </div>
       ))}
+    </div>
+  );
+}
+
+function RfeReasonsContent({ entries }: { entries: PetitionEntry[] }) {
+  const counts = RFE_REASON_OPTIONS.map((r) => ({
+    ...r,
+    count: entries.filter((e) => e.rfe_reason === r.value).length,
+  })).filter((r) => r.count > 0).sort((a, b) => b.count - a.count);
+  const max = Math.max(...counts.map((r) => r.count), 1);
+  if (counts.length === 0) {
+    return <p className="text-xs text-muted-foreground">No RFE reasons reported yet.</p>;
+  }
+  return (
+    <div className="space-y-3">
+      {counts.map((r) => (
+        <div key={r.value} className="space-y-1">
+          <div className="flex justify-between text-xs font-mono">
+            <span className="text-muted-foreground">{r.label}</span>
+            <span className="text-foreground">{r.count}</span>
+          </div>
+          <div className="h-1.5 rounded-full bg-muted/30">
+            <div className="h-full rounded-full bg-orange-400" style={{ width: `${(r.count / max) * 100}%` }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ProcessingTimelineContent({ entries }: { entries: PetitionEntry[] }) {
+  // Parse "MMM d" filing dates against current year, then bucket by ISO week start (Monday).
+  const now = new Date();
+  const year = now.getFullYear();
+  const buckets = new Map<string, { label: string; filed: number; approved: number; rfe: number; sortKey: number }>();
+
+  entries.forEach((e) => {
+    if (!e.filing_date) return;
+    let d: Date;
+    try {
+      d = parse(e.filing_date, "MMM d", new Date(year, 0, 1));
+      if (isNaN(d.getTime())) return;
+      if (d > now) d = parse(e.filing_date, "MMM d", new Date(year - 1, 0, 1));
+    } catch { return; }
+    // Week start (Monday)
+    const dow = (d.getDay() + 6) % 7;
+    const weekStart = new Date(d);
+    weekStart.setDate(d.getDate() - dow);
+    weekStart.setHours(0, 0, 0, 0);
+    const key = weekStart.toISOString().slice(0, 10);
+    const label = format(weekStart, "MMM d");
+    const b = buckets.get(key) ?? { label, filed: 0, approved: 0, rfe: 0, sortKey: weekStart.getTime() };
+    b.filed += 1;
+    if (e.status === "approved") b.approved += 1;
+    if (e.status === "rfe_received" || e.status === "rfe_responded") b.rfe += 1;
+    buckets.set(key, b);
+  });
+
+  const sorted = Array.from(buckets.values()).sort((a, b) => a.sortKey - b.sortKey).slice(-10);
+  if (sorted.length === 0) {
+    return <p className="text-xs text-muted-foreground">No filing dates reported yet.</p>;
+  }
+  const max = Math.max(...sorted.map((b) => b.filed), 1);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-end gap-1.5 h-20">
+        {sorted.map((b) => {
+          const filedH = (b.filed / max) * 100;
+          const approvedH = b.filed ? (b.approved / b.filed) * filedH : 0;
+          const rfeH = b.filed ? (b.rfe / b.filed) * filedH : 0;
+          const otherH = filedH - approvedH - rfeH;
+          return (
+            <div key={b.label} className="flex-1 flex flex-col justify-end gap-0.5 group relative" title={`${b.label}: ${b.filed} filed, ${b.approved} approved, ${b.rfe} RFE`}>
+              {b.approved > 0 && <div className="bg-emerald-400 rounded-t" style={{ height: `${approvedH}%` }} />}
+              {b.rfe > 0 && <div className="bg-orange-400" style={{ height: `${rfeH}%` }} />}
+              {otherH > 0 && <div className={`bg-blue-400/70 ${b.approved === 0 && b.rfe === 0 ? "rounded-t" : ""}`} style={{ height: `${otherH}%` }} />}
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex justify-between text-[9px] font-mono text-muted-foreground">
+        <span>{sorted[0].label}</span>
+        <span>{sorted[sorted.length - 1].label}</span>
+      </div>
+      <div className="flex gap-3 text-[10px] font-mono text-muted-foreground pt-1">
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-emerald-400" />Approved</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-orange-400" />RFE</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-blue-400/70" />Filed</span>
+      </div>
     </div>
   );
 }

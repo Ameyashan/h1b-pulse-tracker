@@ -1,0 +1,1 @@
+ALTER TABLE public.petition_entries ADD COLUMN IF NOT EXISTS rfe_reason TEXT;

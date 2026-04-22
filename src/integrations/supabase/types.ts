@@ -192,6 +192,7 @@ export type Database = {
           job_category: string | null
           law_firm: string | null
           processing_type: string
+          rfe_reason: string | null
           service_center: string
           status: string
           update_code: string
@@ -207,6 +208,7 @@ export type Database = {
           job_category?: string | null
           law_firm?: string | null
           processing_type?: string
+          rfe_reason?: string | null
           service_center: string
           status?: string
           update_code: string
@@ -222,6 +224,7 @@ export type Database = {
           job_category?: string | null
           law_firm?: string | null
           processing_type?: string
+          rfe_reason?: string | null
           service_center?: string
           status?: string
           update_code?: string
