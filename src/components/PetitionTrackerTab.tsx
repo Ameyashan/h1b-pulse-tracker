@@ -358,6 +358,11 @@ export function PetitionTrackerTab() {
               {submitting ? "..." : <>✓ Submit</>}
             </button>
           </div>
+          {(status === "rfe_received" || status === "rfe_responded") && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <DarkSelect label="RFE Reason" value={rfeReason} onChange={setRfeReason} options={RFE_REASON_OPTIONS} placeholder="Select reason (optional)" />
+            </div>
+          )}
           {/* Disclaimer */}
           <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3 flex items-start gap-2.5 text-xs text-amber-200/80">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
