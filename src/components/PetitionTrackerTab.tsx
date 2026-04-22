@@ -413,6 +413,11 @@ export function PetitionTrackerTab() {
               {saving ? "..." : "Save Update"}
             </button>
           </div>
+          {(editStatus === "rfe_received" || editStatus === "rfe_responded") && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <DarkSelect label="RFE Reason" value={editRfeReason} onChange={setEditRfeReason} options={RFE_REASON_OPTIONS} placeholder="Select reason (optional)" />
+            </div>
+          )}
         </div>
       ) : (
         <div className="rounded-[14px] border border-border/60 bg-card p-3 sm:p-4 flex flex-col sm:flex-row items-center gap-3">
