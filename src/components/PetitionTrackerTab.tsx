@@ -156,6 +156,7 @@ export function PetitionTrackerTab() {
   const [editEducation, setEditEducation] = useState("");
   const [editLawFirm, setEditLawFirm] = useState("");
   const [editFiling, setEditFiling] = useState("");
+  const [editRfeReason, setEditRfeReason] = useState("");
   const [saving, setSaving] = useState(false);
 
   // Email CTA
