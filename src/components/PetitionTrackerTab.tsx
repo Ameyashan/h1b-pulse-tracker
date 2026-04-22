@@ -481,22 +481,30 @@ export function PetitionTrackerTab() {
         </GhostPanel>
 
         {/* Top RFE Reasons */}
-        <GhostPanel title="Top RFE Reasons" hasData={false}>
-          <div className="space-y-3 opacity-25">
-            <GhostBar label="Specialty Occupation" />
-            <GhostBar label="Wage Level" />
-            <GhostBar label="Employer Rel." />
-            <GhostBar label="Qualifications" />
-          </div>
+        <GhostPanel title="Top RFE Reasons" hasData={entries.some((e) => e.rfe_reason)}>
+          {entries.some((e) => e.rfe_reason) ? (
+            <RfeReasonsContent entries={entries} />
+          ) : (
+            <div className="space-y-3 opacity-25">
+              <GhostBar label="Specialty Occupation" />
+              <GhostBar label="Wage Level" />
+              <GhostBar label="Employer Rel." />
+              <GhostBar label="Qualifications" />
+            </div>
+          )}
         </GhostPanel>
 
         {/* Processing Timeline */}
-        <GhostPanel title="Processing Timeline" hasData={false}>
-          <div className="flex items-end gap-1.5 h-16 opacity-25">
-            {[30, 50, 20, 60, 40, 70, 35, 55].map((h, i) => (
-              <div key={i} className="flex-1 bg-muted/60 rounded-t" style={{ height: `${h}%` }} />
-            ))}
-          </div>
+        <GhostPanel title="Processing Timeline" hasData={entries.some((e) => e.filing_date)}>
+          {entries.some((e) => e.filing_date) ? (
+            <ProcessingTimelineContent entries={entries} />
+          ) : (
+            <div className="flex items-end gap-1.5 h-16 opacity-25">
+              {[30, 50, 20, 60, 40, 70, 35, 55].map((h, i) => (
+                <div key={i} className="flex-1 bg-muted/60 rounded-t" style={{ height: `${h}%` }} />
+              ))}
+            </div>
+          )}
         </GhostPanel>
       </div>
 
