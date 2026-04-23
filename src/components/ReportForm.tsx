@@ -3,7 +3,7 @@ import { CheckCircle2, XCircle, Send, PartyPopper, Bell, X, Heart } from "lucide
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LawFirmCombobox } from "@/components/LawFirmCombobox";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase-custom";
 import { toast } from "sonner";
 import type { WageLevel, EducationLevel, ReportStatus } from "@/lib/types";
 

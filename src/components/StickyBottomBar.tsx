@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MessageSquarePlus, X } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase-custom";
 import { useLocation } from "react-router-dom";
 
 const EMOJIS = [

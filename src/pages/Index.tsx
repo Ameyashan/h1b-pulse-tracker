@@ -12,7 +12,7 @@ import { PetitionTrackerTab } from "@/components/PetitionTrackerTab";
 import { PetitionCTABanner } from "@/components/PetitionCTABanner";
 import { NextStepsTab } from "@/components/NextStepsTab";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase-custom";
 import type { Report } from "@/lib/types";
 import { countByStatus } from "@/lib/types";
 
