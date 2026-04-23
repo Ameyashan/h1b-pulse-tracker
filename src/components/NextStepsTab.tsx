@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronDown, Send, AlertTriangle, GraduationCap, Building2, RefreshCw, Globe } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase-custom";
 
 interface TimelineStep {
   num: number;

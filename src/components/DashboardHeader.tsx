@@ -1,7 +1,7 @@
 import { RefreshCw, Activity, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase-custom";
 
 function useTotalVisitors() {
   const [count, setCount] = useState<number | null>(null);
