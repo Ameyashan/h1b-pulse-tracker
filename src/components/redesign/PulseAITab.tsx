@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal, type AuthTab } from "./AuthModal";
+import { PulseAIOnboarding } from "./PulseAIOnboarding";
 
 const STARTER_QUESTIONS: { q: string; label: string; icon: JSX.Element }[] = [
   {
@@ -153,6 +154,8 @@ export function PulseAITab() {
   const [authOpen, setAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState<AuthTab>("signup");
   const [showSignupCta, setShowSignupCta] = useState(false);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
+  const [onboardingChecked, setOnboardingChecked] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -177,6 +180,30 @@ export function PulseAITab() {
   useEffect(() => {
     if (bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
   }, [messages, loading]);
+
+  // Open onboarding the first time a logged-in user lands on Pulse AI without
+  // having completed it. The edge function reads profiles directly, so we
+  // don't need to keep the profile in component state after this.
+  useEffect(() => {
+    if (!user) {
+      setOnboardingChecked(false);
+      setOnboardingOpen(false);
+      return;
+    }
+    if (onboardingChecked) return;
+    let cancelled = false;
+    supabase
+      .from("profiles")
+      .select("chat_onboarding_completed_at")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (cancelled) return;
+        setOnboardingChecked(true);
+        if (!data?.chat_onboarding_completed_at) setOnboardingOpen(true);
+      });
+    return () => { cancelled = true; };
+  }, [user?.id, onboardingChecked]);
 
   // Fetch real petition stats
   useEffect(() => {
@@ -482,6 +509,14 @@ export function PulseAITab() {
         </div>
       </aside>
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} initialTab={authTab} />
+      {user && (
+        <PulseAIOnboarding
+          userId={user.id}
+          open={onboardingOpen}
+          onComplete={() => setOnboardingOpen(false)}
+          onSkip={() => setOnboardingOpen(false)}
+        />
+      )}
     </section>
   );
 }

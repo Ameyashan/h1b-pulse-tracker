@@ -233,6 +233,45 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          chat_onboarding_completed_at: string | null
+          country_of_birth: string | null
+          created_at: string
+          current_visa_status: string | null
+          degree_level: string | null
+          email: string | null
+          employer_type: string | null
+          field_of_study: string | null
+          id: string
+          lottery_status: string | null
+        }
+        Insert: {
+          chat_onboarding_completed_at?: string | null
+          country_of_birth?: string | null
+          created_at?: string
+          current_visa_status?: string | null
+          degree_level?: string | null
+          email?: string | null
+          employer_type?: string | null
+          field_of_study?: string | null
+          id: string
+          lottery_status?: string | null
+        }
+        Update: {
+          chat_onboarding_completed_at?: string | null
+          country_of_birth?: string | null
+          created_at?: string
+          current_visa_status?: string | null
+          degree_level?: string | null
+          email?: string | null
+          employer_type?: string | null
+          field_of_study?: string | null
+          id?: string
+          lottery_status?: string | null
+        }
+        Relationships: []
+      }
       signals: {
         Row: {
           author: string
