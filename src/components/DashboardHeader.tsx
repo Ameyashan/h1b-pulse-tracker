@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase-custom";
 
+const REGISTER_VISITOR_URL =
+  "https://rkwcpnoqnxporjqqlxjt.supabase.co/functions/v1/register-visitor";
+
 function useTotalVisitors() {
   const [count, setCount] = useState<number | null>(null);
 
@@ -16,19 +19,25 @@ function useTotalVisitors() {
   }, []);
 
   useEffect(() => {
-    const increment = async () => {
-      if (sessionStorage.getItem("h1b_counted")) {
-        refresh();
-        return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(REGISTER_VISITOR_URL, { method: "POST" });
+        if (res.ok) {
+          const body = await res.json();
+          if (!cancelled && typeof body.count === "number") {
+            setCount(body.count);
+            return;
+          }
+        }
+      } catch {
+        // fall through to read-only refresh
       }
-
-      const { data, error } = await supabase.rpc("increment_visitor_count");
-      if (!error && data != null) {
-        setCount(Number(data));
-        sessionStorage.setItem("h1b_counted", "1");
-      }
+      if (!cancelled) refresh();
+    })();
+    return () => {
+      cancelled = true;
     };
-    increment();
   }, [refresh]);
 
   return { count, refresh };
