@@ -1,122 +1,51 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { DashboardHeader } from "@/components/DashboardHeader";
-import { ReportForm } from "@/components/ReportForm";
-import { StatsCards } from "@/components/StatsCards";
-import { BreakdownGrid } from "@/components/BreakdownGrid";
-import { ReportFeed } from "@/components/ReportFeed";
-import { ResponsesChart } from "@/components/ResponsesChart";
-import { DisclaimerBanner } from "@/components/DisclaimerBanner";
-import { StickyBottomBar } from "@/components/StickyBottomBar";
-import { PetitionTrackerTab } from "@/components/PetitionTrackerTab";
-import { PetitionCTABanner } from "@/components/PetitionCTABanner";
-import { NextStepsTab } from "@/components/NextStepsTab";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { supabase } from "@/lib/supabase-custom";
-import type { Report } from "@/lib/types";
-import { countByStatus } from "@/lib/types";
+import { NewsTicker } from "@/components/redesign/NewsTicker";
+import { AppHeader, type TabKey } from "@/components/redesign/AppHeader";
+import { PulseAITab } from "@/components/redesign/PulseAITab";
+import { LotteryTab } from "@/components/redesign/LotteryTab";
+import { PetitionTab } from "@/components/redesign/PetitionTab";
+import { NextStepsTab } from "@/components/redesign/NextStepsTab";
+
+const PATH_TO_TAB: Record<string, TabKey> = {
+  "/": "pulse",
+  "/pulse": "pulse",
+  "/lottery-tracker": "lottery",
+  "/petition-tracker": "petition",
+  "/next-steps": "steps",
+};
+
+const TAB_TO_PATH: Record<TabKey, string> = {
+  pulse: "/",
+  lottery: "/lottery-tracker",
+  petition: "/petition-tracker",
+  steps: "/next-steps",
+};
 
 export default function Index() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [reports, setReports] = useState<Report[]>([]);
 
-  const TAB_MAP: Record<string, string> = { "/": "petition", "/next-steps": "nextsteps", "/petition-tracker": "petition", "/lottery-tracker": "lottery" };
-  const PATH_MAP: Record<string, string> = { lottery: "/lottery-tracker", nextsteps: "/next-steps", petition: "/" };
-  const activeTab = useMemo(() => TAB_MAP[location.pathname] || "lottery", [location.pathname]);
+  const activeTab = useMemo<TabKey>(
+    () => PATH_TO_TAB[location.pathname] ?? "pulse",
+    [location.pathname]
+  );
 
-  const handleTabChange = (value: string) => {
-    const path = PATH_MAP[value] || "/";
+  const handleTabChange = (tab: TabKey) => {
+    const path = TAB_TO_PATH[tab];
     if (location.pathname !== path) navigate(path, { replace: true });
   };
 
-  const fetchReports = useCallback(async () => {
-    try {
-      const PAGE_SIZE = 1000;
-      let allData: Report[] = [];
-      let from = 0;
-      let hasMore = true;
-
-      while (hasMore) {
-        const { data, error } = await supabase
-          .from("signals")
-          .select("*")
-          .in("classification", ["selected", "not_selected"])
-          .not("wage_level", "is", null)
-          .not("education_level", "is", null)
-          .order("created_utc", { ascending: false })
-          .range(from, from + PAGE_SIZE - 1);
-
-        if (error) throw error;
-        const rows = (data || []) as Report[];
-        allData = allData.concat(rows);
-        hasMore = rows.length === PAGE_SIZE;
-        from += PAGE_SIZE;
-      }
-
-      setReports(allData);
-    } catch (err) {
-      console.error("Error fetching reports:", err);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchReports();
-    const channel = supabase
-      .channel("signals-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "signals" }, () => {
-        fetchReports();
-      })
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  }, [fetchReports]);
-
-  const counts = countByStatus(reports);
-  const total = reports.length;
-
   return (
-    <div className="min-h-screen bg-background">
-      <DashboardHeader isDemoMode={false} onRefresh={fetchReports} onToggleAdmin={() => {}} />
-
-      <main className="container px-4 py-5 max-w-5xl">
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="w-full grid grid-cols-3 mb-4 h-auto">
-            <TabsTrigger value="lottery" className="text-xs sm:text-sm font-semibold px-1 sm:px-3 py-2">
-              Lottery<span className="hidden sm:inline"> Tracker</span>
-            </TabsTrigger>
-            <TabsTrigger value="nextsteps" className="text-xs sm:text-sm font-semibold px-1 sm:px-3 py-2">
-              Next Steps
-            </TabsTrigger>
-            <TabsTrigger value="petition" className="text-xs sm:text-sm font-semibold px-1 sm:px-3 py-2">
-              Petition<span className="hidden sm:inline"> Tracker</span>
-              <span className="ml-1.5 text-[9px] sm:text-[10px] font-bold uppercase rounded-full bg-emerald-500 text-background px-1.5 sm:px-2 py-0.5 leading-none">
-                NEW
-              </span>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="lottery" className="space-y-4">
-            <PetitionCTABanner onNavigate={() => handleTabChange("petition")} />
-            <ReportForm onSubmitted={fetchReports} />
-            <DisclaimerBanner />
-            <StatsCards selected={counts.selected} notSelected={counts.not_selected} total={total} />
-            <BreakdownGrid reports={reports} />
-            <ResponsesChart reports={reports} />
-            <ReportFeed reports={reports} />
-            <div className="h-20" />
-          </TabsContent>
-
-          <TabsContent value="nextsteps">
-            <NextStepsTab />
-          </TabsContent>
-
-          <TabsContent value="petition">
-            <PetitionTrackerTab />
-          </TabsContent>
-        </Tabs>
+    <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
+      <NewsTicker />
+      <AppHeader activeTab={activeTab} onTabChange={handleTabChange} />
+      <main className="rd-main">
+        {activeTab === "pulse" && <PulseAITab />}
+        {activeTab === "lottery" && <LotteryTab />}
+        {activeTab === "petition" && <PetitionTab />}
+        {activeTab === "steps" && <NextStepsTab />}
       </main>
-      <StickyBottomBar />
     </div>
   );
 }

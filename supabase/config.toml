@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.send-selected-email]
 verify_jwt = false
+
+[functions.ask-pulse]
+verify_jwt = false

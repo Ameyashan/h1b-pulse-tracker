@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import type { Report, ReportStatus } from "@/lib/types";
 import { CheckCircle2, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 20;
 
 function ReportRow({ report }: { report: Report }) {
   const isSelected = report.classification === "selected";
