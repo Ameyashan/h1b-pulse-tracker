@@ -6,6 +6,7 @@ import { PulseAITab } from "@/components/redesign/PulseAITab";
 import { LotteryTab } from "@/components/redesign/LotteryTab";
 import { PetitionTab } from "@/components/redesign/PetitionTab";
 import { NextStepsTab } from "@/components/redesign/NextStepsTab";
+import { IntroVideoModal } from "@/components/IntroVideoModal";
 
 const PATH_TO_TAB: Record<string, TabKey> = {
   "/": "pulse",
@@ -38,6 +39,7 @@ export default function Index() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
+      <IntroVideoModal />
       <NewsTicker />
       <AppHeader activeTab={activeTab} onTabChange={handleTabChange} />
       <main className="rd-main">
