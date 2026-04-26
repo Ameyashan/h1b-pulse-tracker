@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal, type AuthTab } from "./AuthModal";
+import { supabase } from "@/lib/supabase-custom";
+
+const REGISTER_VISITOR_URL =
+  "https://rkwcpnoqnxporjqqlxjt.supabase.co/functions/v1/register-visitor";
 
 export type TabKey = "pulse" | "lottery" | "petition" | "steps";
 
@@ -54,14 +58,36 @@ const TABS: { key: TabKey; label: string; badge?: "new" | "ai"; icon: JSX.Elemen
 ];
 
 export function AppHeader({ activeTab, onTabChange, onRefresh }: AppHeaderProps) {
-  const [count, setCount] = useState(83942);
+  const [count, setCount] = useState<number | null>(null);
   const { user, signOut } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState<AuthTab>("login");
 
   useEffect(() => {
-    const id = setInterval(() => setCount((c) => c + Math.floor(Math.random() * 3)), 4000);
-    return () => clearInterval(id);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(REGISTER_VISITOR_URL, { method: "POST" });
+        if (res.ok) {
+          const body = await res.json();
+          if (!cancelled && typeof body.count === "number") {
+            setCount(body.count);
+            return;
+          }
+        }
+      } catch {
+        // fall through to read-only fetch
+      }
+      const { data } = await supabase
+        .from("app_config")
+        .select("value")
+        .eq("key", "visitor_count")
+        .single();
+      if (!cancelled && data) setCount(Number(data.value));
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   function openAuth(t: AuthTab) {
@@ -83,11 +109,13 @@ export function AppHeader({ activeTab, onTabChange, onRefresh }: AppHeaderProps)
         </div>
 
         <div className="top-right">
-          <div className="live-counter">
-            <span className="live-dot" />
-            <span className="num">{count.toLocaleString()}</span>
-            <span className="label">helping each other</span>
-          </div>
+          {count !== null && (
+            <div className="live-counter">
+              <span className="live-dot" />
+              <span className="num">{count.toLocaleString()}</span>
+              <span className="label">helping each other</span>
+            </div>
+          )}
           <button className="icon-btn" title="Refresh" onClick={onRefresh} aria-label="Refresh">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" />

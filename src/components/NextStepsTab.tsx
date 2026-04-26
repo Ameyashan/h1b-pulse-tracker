@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ChevronDown, Send, AlertTriangle, GraduationCap, Building2, RefreshCw, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase-custom";
+import { useVisitorCount } from "@/lib/visitor-count";
 
 interface TimelineStep {
   num: number;
@@ -223,6 +224,7 @@ export function NextStepsTab() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const visitorCount = useVisitorCount();
 
   const handleNotify = async () => {
     if (!email.includes("@")) {
@@ -470,7 +472,8 @@ export function NextStepsTab() {
       {/* Footer */}
       <div className="text-center pt-6 border-t border-border">
         <p className="text-[13px] text-muted-foreground">
-          Built by the <a href="https://h1bpulse.com" className="text-emerald-400 hover:underline">H1B Pulse</a> community · 63,000+ friends helping each other
+          Built by the <a href="https://h1bpulse.com" className="text-emerald-400 hover:underline">H1B Pulse</a> community
+          {visitorCount !== null && <> · {visitorCount.toLocaleString()} friends helping each other</>}
         </p>
       </div>
     </div>
