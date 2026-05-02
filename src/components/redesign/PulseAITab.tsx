@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState, type JSX, type KeyboardEvent } from "react";
+import { Children, Fragment, isValidElement, cloneElement, useEffect, useRef, useState, type JSX, type KeyboardEvent, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal, type AuthTab } from "./AuthModal";
@@ -80,62 +82,89 @@ function isRecentTime(time: string): boolean {
   return /^\d+[mh] ago$/.test(time);
 }
 
-function renderInline(text: string, citations: string[] = []): (string | JSX.Element)[] {
-  const tokens = text.split(/(\*\*[^*]+\*\*|\[\d+\](?:\[\d+\])*)/g);
-  const out: (string | JSX.Element)[] = [];
-  tokens.forEach((tok, i) => {
-    if (!tok) return;
-    if (/^\*\*[^*]+\*\*$/.test(tok)) {
-      out.push(<strong key={i}>{tok.slice(2, -2)}</strong>);
-    } else if (/^(\[\d+\])+$/.test(tok)) {
-      const nums = Array.from(tok.matchAll(/\[(\d+)\]/g)).map((m) => Number(m[1]));
-      out.push(
-        <sup key={i} className="msg-cite">
-          {nums.map((n, k) => {
-            const url = citations[n - 1];
-            return url ? (
-              <a key={k} href={url} target="_blank" rel="noreferrer">{n}</a>
-            ) : (
-              <span key={k}>{n}</span>
-            );
-          })}
-        </sup>,
-      );
-    } else {
-      out.push(tok);
+// Walks through ReactMarkdown's rendered children and replaces `[n]` /
+// `[n][m]` patterns inside text nodes with superscript citation links.
+// Recurses into nested elements (e.g. <strong>, <em>) so citations work
+// anywhere in the prose, not just at paragraph level.
+function citationize(node: ReactNode, citations: string[]): ReactNode {
+  if (typeof node === "string") {
+    if (!/\[\d+\]/.test(node)) return node;
+    const tokens = node.split(/(\[\d+\](?:\[\d+\])*)/g);
+    return tokens.map((tok, i) => {
+      if (!tok) return null;
+      if (/^(\[\d+\])+$/.test(tok)) {
+        const nums = Array.from(tok.matchAll(/\[(\d+)\]/g)).map((m) => Number(m[1]));
+        return (
+          <sup key={i} className="msg-cite">
+            {nums.map((n, k) => {
+              const url = citations[n - 1];
+              return url ? (
+                <a key={k} href={url} target="_blank" rel="noreferrer">{n}</a>
+              ) : (
+                <span key={k}>{n}</span>
+              );
+            })}
+          </sup>
+        );
+      }
+      return <Fragment key={i}>{tok}</Fragment>;
+    });
+  }
+  if (Array.isArray(node)) {
+    return node.map((c, i) => <Fragment key={i}>{citationize(c, citations)}</Fragment>);
+  }
+  if (isValidElement(node)) {
+    const props = node.props as { children?: ReactNode };
+    if (props.children !== undefined) {
+      return cloneElement(node, {}, citationize(props.children, citations));
     }
-  });
-  return out;
+  }
+  return node;
 }
 
 function renderMessage(content: string, citations: string[] = []): JSX.Element {
-  const blocks = content.trim().split(/\n{2,}/);
   return (
-    <>
-      {blocks.map((block, bi) => {
-        const lines = block.split("\n");
-        const isList = lines.every((l) => /^\s*[-*]\s+/.test(l));
-        if (isList) {
-          return (
-            <ul key={bi} className="msg-list">
-              {lines.map((l, li) => (
-                <li key={li}>{renderInline(l.replace(/^\s*[-*]\s+/, ""), citations)}</li>
-              ))}
-            </ul>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        p: ({ children }) => <p className="msg-p">{citationize(children, citations)}</p>,
+        ul: ({ children }) => <ul className="msg-list">{Children.toArray(children)}</ul>,
+        ol: ({ children }) => <ol className="msg-list-ordered">{Children.toArray(children)}</ol>,
+        li: ({ children }) => <li>{citationize(children, citations)}</li>,
+        // Downscale chat-bubble headings so they don't dwarf the surrounding prose.
+        h1: ({ children }) => <h4 className="msg-h">{citationize(children, citations)}</h4>,
+        h2: ({ children }) => <h4 className="msg-h">{citationize(children, citations)}</h4>,
+        h3: ({ children }) => <h5 className="msg-h">{citationize(children, citations)}</h5>,
+        h4: ({ children }) => <h5 className="msg-h">{citationize(children, citations)}</h5>,
+        h5: ({ children }) => <h6 className="msg-h">{citationize(children, citations)}</h6>,
+        h6: ({ children }) => <h6 className="msg-h">{citationize(children, citations)}</h6>,
+        table: ({ children }) => (
+          <div className="msg-table-wrap">
+            <table className="msg-table">{children}</table>
+          </div>
+        ),
+        thead: ({ children }) => <thead>{children}</thead>,
+        tbody: ({ children }) => <tbody>{children}</tbody>,
+        tr: ({ children }) => <tr>{children}</tr>,
+        th: ({ children }) => <th>{citationize(children, citations)}</th>,
+        td: ({ children }) => <td>{citationize(children, citations)}</td>,
+        code: ({ children, className }) => {
+          const isBlock = /language-/.test(className ?? "");
+          return isBlock ? (
+            <pre className="msg-pre"><code>{children}</code></pre>
+          ) : (
+            <code className="msg-code">{children}</code>
           );
-        }
-        return (
-          <p key={bi} className="msg-p">
-            {lines.map((l, li) => (
-              <span key={li}>
-                {renderInline(l, citations)}
-                {li < lines.length - 1 && <br />}
-              </span>
-            ))}
-          </p>
-        );
-      })}
-    </>
+        },
+        a: ({ href, children }) => (
+          <a href={href} target="_blank" rel="noreferrer" className="msg-link">{children}</a>
+        ),
+        blockquote: ({ children }) => <blockquote className="msg-quote">{children}</blockquote>,
+        hr: () => <hr className="msg-hr" />,
+      }}
+    >
+      {content}
+    </ReactMarkdown>
   );
 }
 

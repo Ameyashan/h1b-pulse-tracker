@@ -462,6 +462,97 @@
   }
   .msg-cite a:hover { background: color-mix(in srgb, var(--accent-green) 22%, transparent); }
 
+  /* Markdown elements rendered inside chat bubbles. Sized to feel like prose,
+     not a document — chat bubbles are a constrained surface. */
+  .msg-bubble .msg-h {
+    margin: 14px 0 6px;
+    font-weight: 650;
+    line-height: 1.3;
+  }
+  .msg-bubble h4.msg-h { font-size: 15.5px; }
+  .msg-bubble h5.msg-h { font-size: 14.5px; }
+  .msg-bubble h6.msg-h { font-size: 14px; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.04em; }
+  .msg-bubble > .msg-h:first-child { margin-top: 0; }
+
+  .msg-bubble .msg-list-ordered {
+    margin: 0;
+    padding-left: 22px;
+    list-style: decimal;
+  }
+  .msg-bubble .msg-list-ordered li { margin: 2px 0; }
+  .msg-bubble .msg-p + .msg-list-ordered,
+  .msg-bubble .msg-list-ordered + .msg-p { margin-top: 10px; }
+
+  .msg-bubble .msg-table-wrap {
+    margin: 10px 0;
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  .msg-bubble .msg-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  .msg-bubble .msg-table th,
+  .msg-bubble .msg-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  .msg-bubble .msg-table thead th {
+    background: var(--bg-elev);
+    font-weight: 600;
+    font-size: 12.5px;
+    color: var(--ink-2);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .msg-bubble .msg-table tbody tr:last-child td { border-bottom: none; }
+
+  .msg-bubble .msg-code {
+    background: var(--bg-elev);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+  }
+  .msg-bubble .msg-pre {
+    background: var(--bg-elev);
+    padding: 10px 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    margin: 10px 0;
+  }
+  .msg-bubble .msg-pre code {
+    background: transparent;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  .msg-bubble .msg-link {
+    color: var(--accent-green);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .msg-bubble .msg-link:hover { text-decoration-thickness: 2px; }
+
+  .msg-bubble .msg-quote {
+    margin: 10px 0;
+    padding: 4px 12px;
+    border-left: 3px solid var(--line);
+    color: var(--ink-2);
+    font-style: italic;
+  }
+
+  .msg-bubble .msg-hr {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 14px 0;
+  }
+
   .suggested { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
   .chip {
     padding: 10px 14px;
