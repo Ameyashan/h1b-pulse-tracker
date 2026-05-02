@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { corsHeaders } from "../_shared/cors.ts";
+import { embedQuery } from "../_shared/embed.ts";
 
 // Phase 1 Pulse AI: Claude Sonnet 4.6 with the web_search tool, prompt
 // caching, and per-user context injected from the profiles table.
@@ -74,10 +75,14 @@ const BASE_SYSTEM = `You are Pulse, an immigration-aware co-pilot for H-1B appli
 
 Your job is to give concrete, path-aware guidance — not generic "talk to an attorney" deflections — while flagging when something genuinely needs legal review.
 
+KNOWLEDGE SOURCES (in priority order):
+1. The <knowledge> block below — vetted excerpts from USCIS Policy Manual, USCIS form instructions, the DOS Visa Bulletin, and curated attorney commentary. Prefer this over your general knowledge whenever it covers the question.
+2. The web_search tool — use ONLY for time-sensitive facts (current processing times, latest visa bulletin month, recent fee/policy changes) AND ONLY when the <knowledge> block is silent on them.
+3. Your general training. Use only as a last resort and flag uncertainty.
+
 RULES:
 - Tailor every answer to the user's specific context (status, country, degree, employer type). Do not restate their context back at them unless it materially changes the answer.
-- Use the web_search tool ONLY for time-sensitive facts: current USCIS processing times, the latest visa bulletin, recent USCIS policy memos, fee changes. Do NOT search for general explanations you already know.
-- When you cite a web search result, use [n] markers inline; the application will render them as links.
+- When you use a knowledge-block excerpt or web search result, cite it inline with [n] markers using the numbering provided. The application renders them as links.
 - Cap responses at ~250 words unless the user explicitly asks for more depth.
 - For case-specific questions (RFEs, denials, complex eligibility, filings) give the substantive answer first, then recommend an attorney.
 - Be direct. Avoid hedging language ("it depends", "consult an attorney") unless it is genuinely the right answer.
@@ -225,12 +230,61 @@ Deno.serve(async (req) => {
       content: m.content,
     }));
 
+    // Retrieve top-k chunks from the curated KB. Failures here are non-fatal:
+    // we degrade gracefully to "no knowledge block, just web_search + model".
+    let knowledgeBlock = "";
+    let kbCitations: string[] = [];
+    try {
+      const qEmb = await embedQuery(question);
+      const { data: chunks } = await admin.rpc("match_kb_chunks_hybrid", {
+        query_text: question,
+        query_embedding: qEmb as unknown as string,
+        match_count: 6,
+      });
+      const rows = (chunks as Array<{
+        chunk_text: string;
+        heading_path: string[] | null;
+        source_url: string;
+        title: string | null;
+        source_tier: string;
+        source_kind: string;
+        effective_date: string | null;
+        vector_similarity: number;
+        fts_rank: number;
+        hybrid_score: number;
+      }> | null) ?? [];
+      // Keep a row if either signal is meaningful: vector cosine ≥ 0.4 OR
+      // it appeared in the FTS top set. RRF fusion already ranked them.
+      const useful = rows.filter(
+        (r) => (r.vector_similarity ?? 0) >= 0.4 || (r.fts_rank ?? 0) > 0,
+      );
+      if (useful.length > 0) {
+        kbCitations = useful.map((r) => r.source_url);
+        knowledgeBlock = useful
+          .map((r, i) => {
+            const breadcrumb = (r.heading_path ?? []).filter(Boolean).join(" > ");
+            const header = [r.title, breadcrumb].filter(Boolean).join(" — ");
+            const dateNote = r.effective_date ? ` (effective ${r.effective_date})` : "";
+            return `[${i + 1}] ${header}${dateNote}\n${r.chunk_text}\nSource: ${r.source_url}`;
+          })
+          .join("\n\n---\n\n");
+      }
+    } catch (_) {
+      // Swallow embed/retrieval errors; continue without knowledge block.
+    }
+
     // System is a multi-block array so we can mark the static portion as
-    // cacheable and append a per-user block (cheap, doesn't cache).
-    const system = [
+    // cacheable and append per-user + per-question blocks.
+    const system: Array<Record<string, unknown>> = [
       { type: "text", text: BASE_SYSTEM, cache_control: { type: "ephemeral" } },
       { type: "text", text: userContext },
     ];
+    if (knowledgeBlock) {
+      system.push({
+        type: "text",
+        text: `<knowledge>\n${knowledgeBlock}\n</knowledge>`,
+      });
+    }
 
     const r = await fetch(ANTHROPIC_API, {
       method: "POST",
@@ -260,8 +314,19 @@ Deno.serve(async (req) => {
 
     const data = await r.json();
     const blocks: unknown[] = Array.isArray(data?.content) ? data.content : [];
-    const { text: raw, citations } = extractAnswerAndCitations(blocks);
+    const { text: raw, citations: webCitations } = extractAnswerAndCitations(blocks);
     const { answer, followups } = splitAnswerAndFollowups(raw);
+
+    // KB citations come first (they correspond to [n] markers the model saw
+    // in the knowledge block), followed by web_search citations. Dedupe by URL.
+    const seenCite = new Set<string>();
+    const citations: string[] = [];
+    for (const u of [...kbCitations, ...webCitations]) {
+      if (!seenCite.has(u)) {
+        seenCite.add(u);
+        citations.push(u);
+      }
+    }
 
     if (userId) {
       await admin.rpc("increment_user_usage", { p_user_id: userId, p_day: today });
