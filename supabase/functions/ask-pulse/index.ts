@@ -1,6 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { corsHeaders } from "../_shared/cors.ts";
 import { embedQuery } from "../_shared/embed.ts";
+import type { ProfileRow } from "../_shared/profile.ts";
+import { matchPlaybook } from "../_shared/playbooks/index.ts";
 
 // Phase 1 Pulse AI: Claude Sonnet 4.6 with the web_search tool, prompt
 // caching, and per-user context injected from the profiles table.
@@ -45,15 +47,6 @@ const EMPLOYER_LABEL: Record<string, string> = {
   other: "Other",
 };
 
-type ProfileRow = {
-  current_visa_status: string | null;
-  lottery_status: string | null;
-  degree_level: string | null;
-  field_of_study: string | null;
-  employer_type: string | null;
-  country_of_birth: string | null;
-};
-
 function buildUserContextBlock(p: ProfileRow | null): string {
   if (!p) {
     return "USER CONTEXT: anonymous visitor — no profile on file. Ask brief clarifying questions when their situation materially changes the answer.";
@@ -76,9 +69,10 @@ const BASE_SYSTEM = `You are Pulse, an immigration-aware co-pilot for H-1B appli
 Your job is to give concrete, path-aware guidance — not generic "talk to an attorney" deflections — while flagging when something genuinely needs legal review.
 
 KNOWLEDGE SOURCES (in priority order):
-1. The <knowledge> block below — vetted excerpts from USCIS Policy Manual, USCIS form instructions, the DOS Visa Bulletin, and curated attorney commentary. Prefer this over your general knowledge whenever it covers the question.
-2. The web_search tool — use ONLY for time-sensitive facts (current processing times, latest visa bulletin month, recent fee/policy changes) AND ONLY when the <knowledge> block is silent on them.
-3. Your general training. Use only as a last resort and flag uncertainty.
+1. The <archetype_playbook> block IF PRESENT — this is the strongest signal for "what should I do" questions. It encodes the realistic paths for users in the current archetype, with eligibility heuristics and risk flags. Follow its "How to respond" instructions exactly: classify the user, pick 2-3 best-fit paths, explain briefly, and only ask ONE follow-up if a path-determining fact is missing.
+2. The <knowledge> block — vetted excerpts from USCIS Policy Manual, USCIS form instructions, the DOS Visa Bulletin, and curated attorney commentary. Prefer this over your general knowledge whenever it covers the question. Use it to ground specific claims (cite with [n] markers).
+3. The web_search tool — use ONLY for time-sensitive facts (current processing times, latest visa bulletin month, recent fee/policy changes) AND ONLY when the <knowledge> block is silent on them.
+4. Your general training. Use only as a last resort and flag uncertainty.
 
 RULES:
 - Tailor every answer to the user's specific context (status, country, degree, employer type). Do not restate their context back at them unless it materially changes the answer.
@@ -280,6 +274,11 @@ Deno.serve(async (req) => {
       // Swallow embed/retrieval errors; continue without knowledge block.
     }
 
+    // Match an archetype playbook against profile + question shape.
+    // Conditional: only fires for logged-in users whose situation maps to
+    // a known archetype AND whose question is open-ended.
+    const playbook = matchPlaybook(profile, question, trimmedHistory);
+
     // System is a multi-block array so we can mark the static portion as
     // cacheable and append per-user + per-question blocks.
     const system: Array<Record<string, unknown>> = [
@@ -290,6 +289,12 @@ Deno.serve(async (req) => {
       system.push({
         type: "text",
         text: `<knowledge>\n${knowledgeBlock}\n</knowledge>`,
+      });
+    }
+    if (playbook) {
+      system.push({
+        type: "text",
+        text: `<archetype_playbook archetype="${playbook.archetype}">\n${playbook.content}\n</archetype_playbook>`,
       });
     }
 
@@ -348,7 +353,13 @@ Deno.serve(async (req) => {
       question,
       answer_chars: answer.length,
       citation_count: citations.length,
+      // archetype is a free-form string column we'd ideally add to
+      // pulse_query_log; until then it lives in a console log so it's
+      // visible in edge-function logs for observability.
     });
+    if (playbook) {
+      console.log(`playbook_fired archetype=${playbook.archetype} user=${userId ?? "anon"}`);
+    }
 
     return jsonResponse({ answer, citations, followups });
   } catch (e) {
