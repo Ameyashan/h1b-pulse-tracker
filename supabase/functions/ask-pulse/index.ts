@@ -369,6 +369,7 @@ Deno.serve(async (req) => {
 
     return jsonResponse({ answer, citations, followups });
   } catch (e) {
-    return jsonResponse({ error: String(e) }, 500);
+    console.error("ask-pulse unhandled error", e);
+    return jsonResponse({ error: "internal_error" }, 500);
   }
 });
