@@ -23,6 +23,7 @@ const App = () => (
           <Route path="/lottery-tracker" element={<Index />} />
           <Route path="/next-steps" element={<Index />} />
           <Route path="/petition-tracker" element={<Index />} />
+          <Route path="/ds-160" element={<Index />} />
           <Route path="/unsubscribe" element={<Unsubscribe />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

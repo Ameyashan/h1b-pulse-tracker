@@ -966,6 +966,134 @@
     text-transform: uppercase; letter-spacing: .06em; font-weight: 500;
   }
 
+  /* ========== DS-160 GUIDE ========== */
+  .ds160-checklist {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .ds160-check {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .ds160-check:hover { border-color: var(--line-strong); }
+  .ds160-check.done { background: var(--accent-soft); border-color: rgba(16,185,129,.3); }
+  .ds160-check input[type="checkbox"] {
+    width: 18px; height: 18px; margin-top: 2px;
+    accent-color: var(--accent-2);
+    cursor: pointer;
+  }
+  .ds160-check-body { flex: 1; }
+  .ds160-check-label { font-weight: 600; font-size: 14px; color: var(--ink); }
+  .ds160-check.done .ds160-check-label { color: var(--accent-ink); }
+  .ds160-check-hint { font-size: 12.5px; color: var(--ink-3); margin-top: 3px; line-height: 1.5; }
+
+  .ds160-gotcha-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .ds160-gotcha {
+    background: var(--warn-soft);
+    border: 1px solid rgba(245,158,11,.25);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .ds160-gotcha-title {
+    font-weight: 600; font-size: 13.5px; color: #78350F;
+    display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+  }
+  .ds160-gotcha p { margin: 0; font-size: 13px; color: #78350F; line-height: 1.55; }
+
+  .ds160-accordion { display: flex; flex-direction: column; gap: 8px; }
+  .ds160-section {
+    background: var(--bg-elev);
+    border: 1px solid var(--line) !important;
+    border-radius: 14px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .ds160-section-trigger { padding: 18px 20px !important; }
+  .ds160-section-trigger:hover { text-decoration: none !important; }
+  .ds160-section-head { display: flex; align-items: center; gap: 16px; text-align: left; flex: 1; }
+  .ds160-section-num {
+    width: 36px; height: 36px; flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--bg-sunken);
+    color: var(--ink-2);
+    display: grid; place-items: center;
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px; font-weight: 600;
+  }
+  .ds160-section-title { font-size: 16px; font-weight: 600; color: var(--ink); }
+  .ds160-section-subtitle { font-size: 13px; color: var(--ink-3); margin-top: 2px; }
+
+  .ds160-fields { margin: 0; padding: 0 20px 8px 70px; display: flex; flex-direction: column; gap: 18px; }
+  .ds160-field { display: block; }
+  .ds160-field dt {
+    font-size: 14px; font-weight: 600; color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .ds160-field dd { margin: 0; }
+  .ds160-field dd p {
+    margin: 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.6;
+  }
+  .ds160-field-gotcha {
+    margin-top: 8px;
+    background: var(--warn-soft);
+    border-left: 3px solid var(--warn);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12.5px;
+    color: #78350F;
+    line-height: 1.55;
+  }
+  .ds160-field-gotcha span { margin-right: 4px; }
+
+  .ds160-cta {
+    margin-top: 32px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    background: var(--ink);
+    color: var(--bg);
+    border-radius: 14px;
+    padding: 22px 24px;
+    flex-wrap: wrap;
+  }
+  .ds160-cta-title { font-size: 17px; font-weight: 600; }
+  .ds160-cta-sub { font-size: 13px; color: var(--ink-4); margin-top: 4px; }
+
+  /* ========== DS-160 SEASONAL BANNER ========== */
+  .ds160-banner {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    background: linear-gradient(90deg, var(--accent-soft), var(--warn-soft));
+    border-bottom: 1px solid var(--line);
+    padding: 10px 20px;
+    font-size: 13.5px;
+    color: var(--ink);
+    flex-wrap: wrap;
+  }
+  .ds160-banner-body { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  .ds160-banner-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10.5px; font-weight: 600;
+    background: var(--ink); color: var(--bg);
+    padding: 3px 8px; border-radius: 999px;
+    text-transform: uppercase; letter-spacing: .06em;
+    flex-shrink: 0;
+  }
+  .ds160-banner-link { color: var(--accent-ink); font-weight: 600; text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-size: inherit; font-family: inherit; }
+  .ds160-banner-dismiss {
+    background: none; border: none; cursor: pointer;
+    color: var(--ink-3); padding: 4px 8px;
+    font-size: 18px; line-height: 1;
+  }
+  .ds160-banner-dismiss:hover { color: var(--ink); }
+
   @media (max-width: 1040px) {
     .pulse-hero { grid-template-columns: 1fr; }
     .pulse-side { flex-direction: row; flex-wrap: wrap; }
@@ -974,6 +1102,9 @@
     .three-col { grid-template-columns: 1fr; }
     .kpi-row { grid-template-columns: 1fr; }
     .form-grid { grid-template-columns: repeat(2, 1fr); }
+    .ds160-checklist { grid-template-columns: 1fr; }
+    .ds160-gotcha-grid { grid-template-columns: 1fr; }
+    .ds160-fields { padding-left: 20px; }
   }
 }
 

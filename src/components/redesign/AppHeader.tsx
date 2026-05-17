@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase-custom";
 const REGISTER_VISITOR_URL =
   "https://rkwcpnoqnxporjqqlxjt.supabase.co/functions/v1/register-visitor";
 
-export type TabKey = "pulse" | "lottery" | "petition" | "steps";
+export type TabKey = "pulse" | "lottery" | "petition" | "ds160" | "steps";
 
 interface AppHeaderProps {
   activeTab: TabKey;
@@ -42,6 +42,19 @@ const TABS: { key: TabKey; label: string; badge?: "new" | "ai"; icon: JSX.Elemen
       <svg className="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" />
         <circle cx="12" cy="12" r="4" />
+      </svg>
+    ),
+  },
+  {
+    key: "ds160",
+    label: "DS-160 Guide",
+    badge: "new",
+    icon: (
+      <svg className="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="9" y1="13" x2="15" y2="13" />
+        <line x1="9" y1="17" x2="15" y2="17" />
       </svg>
     ),
   },
