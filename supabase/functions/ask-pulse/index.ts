@@ -233,7 +233,7 @@ Deno.serve(async (req) => {
 
     const trimmedHistory = (Array.isArray(history) ? history.slice(-6) : []).map((m) => ({
       role: m.role,
-      content: m.content,
+      content: typeof m.content === "string" ? m.content.slice(0, MAX_HISTORY_MSG_CHARS) : "",
     }));
 
     // Retrieve top-k chunks from the curated KB. Failures here are non-fatal:
