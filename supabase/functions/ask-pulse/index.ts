@@ -326,7 +326,8 @@ Deno.serve(async (req) => {
 
     if (!r.ok) {
       const detail = await r.text();
-      return jsonResponse({ error: "anthropic_error", detail }, 502);
+      console.error("Anthropic upstream error", { status: r.status, detail });
+      return jsonResponse({ error: "upstream_error" }, 502);
     }
 
     const data = await r.json();
