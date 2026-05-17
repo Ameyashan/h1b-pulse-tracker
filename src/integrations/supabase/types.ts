@@ -343,7 +343,54 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      petition_entries_public: {
+        Row: {
+          created_at: string | null
+          education: string | null
+          filing_date: string | null
+          id: string | null
+          job_category: string | null
+          law_firm: string | null
+          processing_type: string | null
+          rfe_reason: string | null
+          service_center: string | null
+          status: string | null
+          update_code: string | null
+          updated_at: string | null
+          wage_level: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          education?: string | null
+          filing_date?: string | null
+          id?: string | null
+          job_category?: string | null
+          law_firm?: string | null
+          processing_type?: string | null
+          rfe_reason?: string | null
+          service_center?: string | null
+          status?: string | null
+          update_code?: string | null
+          updated_at?: string | null
+          wage_level?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          education?: string | null
+          filing_date?: string | null
+          id?: string | null
+          job_category?: string | null
+          law_firm?: string | null
+          processing_type?: string | null
+          rfe_reason?: string | null
+          service_center?: string | null
+          status?: string | null
+          update_code?: string | null
+          updated_at?: string | null
+          wage_level?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       delete_email: {
