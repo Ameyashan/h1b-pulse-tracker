@@ -205,7 +205,7 @@ export function PetitionTab() {
     setLookingUp(true);
     try {
       const { data, error } = await supabase
-        .from("petition_entries")
+        .from("petition_entries_public")
         .select("update_code, status")
         .eq("update_code", code)
         .maybeSingle();
