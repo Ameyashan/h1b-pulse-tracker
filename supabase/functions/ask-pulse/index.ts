@@ -161,6 +161,11 @@ Deno.serve(async (req) => {
     if (!question || typeof question !== "string") {
       return jsonResponse({ error: "question required" }, 400);
     }
+    const MAX_QUESTION_CHARS = 2000;
+    const MAX_HISTORY_MSG_CHARS = 4000;
+    if (question.length > MAX_QUESTION_CHARS) {
+      return jsonResponse({ error: "question_too_long" }, 400);
+    }
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
