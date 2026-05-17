@@ -237,7 +237,7 @@ export function PulseAITab() {
   // Fetch real petition stats
   useEffect(() => {
     supabase
-      .from("petition_entries")
+      .from("petition_entries_public")
       .select("status")
       .then(({ data }) => {
         if (!data) return;
