@@ -1,11 +1,21 @@
-const STEPS = [
+type Step = {
+  state: string;
+  num: string;
+  title: string;
+  when: string;
+  whenClass: string;
+  body: string;
+  link?: { href: string; label: string };
+};
+
+const STEPS: Step[] = [
   { state: "done", num: "✓", title: "Confirm your selection", when: "Done", whenClass: "done", body: "Verify your selection status on your USCIS online account and confirm with your employer/attorney." },
   { state: "current", num: "2", title: "Gather your documents", when: "Now · Apr–May", whenClass: "now", body: "Collect everything your attorney needs for the I-129 petition — passport copies, diplomas, employment letters, pay stubs, and supporting evidence." },
   { state: "", num: "3", title: "Employer files I-129 petition", when: "Apr – Jun 30", whenClass: "", body: "Your employer files Form I-129 with USCIS. This is the core petition — deadline is June 30, 2026." },
   { state: "", num: "4", title: "Receive receipt notice (I-797C)", when: "2–4 wks after filing", whenClass: "", body: "USCIS sends a receipt notice confirming your case is pending. Save it — you'll need the receipt number to track everything." },
   { state: "", num: "5", title: "Handle an RFE (if you get one)", when: "Varies", whenClass: "", body: "USCIS may request more documentation. Don't panic — RFEs are common and manageable. Pulse has data on top RFE reasons." },
   { state: "", num: "6", title: "Get your approval (I-797A)", when: "3–8 mo after filing", whenClass: "", body: "USCIS approves your petition. Your H-1B status begins October 1, 2026." },
-  { state: "", num: "7", title: "Start your H-1B", when: "Oct 1", whenClass: "", body: "Begin employment on your H-1B status. If you're abroad, start consular processing and get your visa stamp." },
+  { state: "", num: "7", title: "Start your H-1B", when: "Oct 1", whenClass: "", body: "Begin employment on your H-1B status. If you're abroad, start consular processing and get your visa stamp.", link: { href: "/ds-160", label: "Full DS-160 walkthrough →" } },
 ];
 
 export function NextStepsTab() {
@@ -62,7 +72,11 @@ export function NextStepsTab() {
               <span className={`when ${s.whenClass}`}>{s.when}</span>
             </div>
             <p>{s.body}</p>
-            <span className="step-expand">Details ↓</span>
+            {s.link ? (
+              <a href={s.link.href} className="step-expand" style={{ color: "var(--accent-2)" }}>{s.link.label}</a>
+            ) : (
+              <span className="step-expand">Details ↓</span>
+            )}
           </div>
         ))}
       </div>
