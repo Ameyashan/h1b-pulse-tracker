@@ -105,7 +105,7 @@ export function PetitionTab() {
 
   const fetchEntries = useCallback(async () => {
     const { data, error } = await supabase
-      .from("petition_entries")
+      .from("petition_entries_public")
       .select("*")
       .order("created_at", { ascending: false })
       .limit(2000);
@@ -113,7 +113,7 @@ export function PetitionTab() {
       console.error("Failed to load petition entries", error);
       return;
     }
-    setEntries((data as PetitionEntry[]) ?? []);
+    setEntries((data as unknown as PetitionEntry[]) ?? []);
   }, []);
 
   useEffect(() => {
