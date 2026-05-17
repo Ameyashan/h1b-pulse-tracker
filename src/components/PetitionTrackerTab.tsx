@@ -165,8 +165,8 @@ export function PetitionTrackerTab() {
   const [ctaSubmitted, setCtaSubmitted] = useState(false);
 
   const fetchEntries = useCallback(async () => {
-    const { data } = await supabase.from("petition_entries").select("*").order("created_at", { ascending: false });
-    if (data) setEntries(data as PetitionEntry[]);
+    const { data } = await supabase.from("petition_entries_public").select("*").order("created_at", { ascending: false });
+    if (data) setEntries(data as unknown as PetitionEntry[]);
   }, []);
 
   useEffect(() => {
@@ -227,7 +227,7 @@ export function PetitionTrackerTab() {
     if (!lookupCode.trim()) return;
     setLookingUp(true);
     try {
-      const { data, error } = await supabase.from("petition_entries").select("*").eq("update_code", lookupCode.trim().toUpperCase()).maybeSingle();
+      const { data, error } = await supabase.from("petition_entries_public").select("*").eq("update_code", lookupCode.trim().toUpperCase()).maybeSingle();
       if (error) throw error;
       if (!data) { toast.error("No petition found with that code"); setLookupEntry(null); return; }
       const entry = data as PetitionEntry;

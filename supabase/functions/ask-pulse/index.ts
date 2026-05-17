@@ -161,6 +161,11 @@ Deno.serve(async (req) => {
     if (!question || typeof question !== "string") {
       return jsonResponse({ error: "question required" }, 400);
     }
+    const MAX_QUESTION_CHARS = 2000;
+    const MAX_HISTORY_MSG_CHARS = 4000;
+    if (question.length > MAX_QUESTION_CHARS) {
+      return jsonResponse({ error: "question_too_long" }, 400);
+    }
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -228,7 +233,7 @@ Deno.serve(async (req) => {
 
     const trimmedHistory = (Array.isArray(history) ? history.slice(-6) : []).map((m) => ({
       role: m.role,
-      content: m.content,
+      content: typeof m.content === "string" ? m.content.slice(0, MAX_HISTORY_MSG_CHARS) : "",
     }));
 
     // Retrieve top-k chunks from the curated KB. Failures here are non-fatal:
@@ -321,7 +326,8 @@ Deno.serve(async (req) => {
 
     if (!r.ok) {
       const detail = await r.text();
-      return jsonResponse({ error: "anthropic_error", detail }, 502);
+      console.error("Anthropic upstream error", { status: r.status, detail });
+      return jsonResponse({ error: "upstream_error" }, 502);
     }
 
     const data = await r.json();
@@ -363,6 +369,7 @@ Deno.serve(async (req) => {
 
     return jsonResponse({ answer, citations, followups });
   } catch (e) {
-    return jsonResponse({ error: String(e) }, 500);
+    console.error("ask-pulse unhandled error", e);
+    return jsonResponse({ error: "internal_error" }, 500);
   }
 });

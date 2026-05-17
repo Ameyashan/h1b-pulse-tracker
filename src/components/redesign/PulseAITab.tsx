@@ -221,12 +221,12 @@ export function PulseAITab() {
     }
     if (onboardingChecked) return;
     let cancelled = false;
-    supabase
+    (supabase as any)
       .from("profiles")
       .select("chat_onboarding_completed_at")
       .eq("id", user.id)
       .maybeSingle()
-      .then(({ data }) => {
+      .then(({ data }: { data: { chat_onboarding_completed_at?: string | null } | null }) => {
         if (cancelled) return;
         setOnboardingChecked(true);
         if (!data?.chat_onboarding_completed_at) setOnboardingOpen(true);
@@ -237,7 +237,7 @@ export function PulseAITab() {
   // Fetch real petition stats
   useEffect(() => {
     supabase
-      .from("petition_entries")
+      .from("petition_entries_public")
       .select("status")
       .then(({ data }) => {
         if (!data) return;

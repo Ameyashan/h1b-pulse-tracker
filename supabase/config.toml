@@ -21,5 +21,14 @@ verify_jwt = false
 [functions.send-selected-email]
 verify_jwt = false
 
+[functions.send-selected-email]
+verify_jwt = true
+
+[functions.ingest-signals]
+verify_jwt = true
+
+[functions.poll-reddit]
+verify_jwt = true
+
 [functions.ask-pulse]
 verify_jwt = false
