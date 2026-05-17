@@ -165,8 +165,8 @@ export function PetitionTrackerTab() {
   const [ctaSubmitted, setCtaSubmitted] = useState(false);
 
   const fetchEntries = useCallback(async () => {
-    const { data } = await supabase.from("petition_entries").select("*").order("created_at", { ascending: false });
-    if (data) setEntries(data as PetitionEntry[]);
+    const { data } = await supabase.from("petition_entries_public").select("*").order("created_at", { ascending: false });
+    if (data) setEntries(data as unknown as PetitionEntry[]);
   }, []);
 
   useEffect(() => {
