@@ -110,7 +110,7 @@ export function PulseAIOnboarding({ userId, open, onComplete, onSkip }: Props) {
       country_of_birth: countryOfBirth.trim() || null,
       chat_onboarding_completed_at: new Date().toISOString(),
     };
-    const { error: upErr } = await supabase
+    const { error: upErr } = await (supabase as any)
       .from("profiles")
       .update(payload)
       .eq("id", userId);
